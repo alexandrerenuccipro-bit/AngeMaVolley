@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `administrateur` (
   `num_user` int NOT NULL,
   `niveau_acces` enum('super_admin','moderateur') DEFAULT 'moderateur',
   PRIMARY KEY (`num_user`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `administrateur`
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `club` (
   `date_creation` date DEFAULT NULL,
   `site_web` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`num_club`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `club`
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `coach` (
   `diplome` varchar(100) DEFAULT NULL,
   `annees_experience` int DEFAULT '0',
   PRIMARY KEY (`num_user`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `coach`
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `equipe` (
   PRIMARY KEY (`num_equipe`),
   KEY `num_club` (`num_club`),
   KEY `num_coach` (`num_coach`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipe`
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `equipe_licencie` (
   `capitaine` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`num_equipe`,`num_user`),
   KEY `num_user` (`num_user`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipe_licencie`
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `createur` int DEFAULT NULL,
   PRIMARY KEY (`num_evenement`),
   KEY `createur` (`createur`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `evenement`
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS `licence` (
   PRIMARY KEY (`num_licence`),
   KEY `num_user` (`num_user`),
   KEY `num_validateur` (`num_validateur`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `licence`
@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS `licencie` (
   `numero_securite_sociale` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`num_user`),
   KEY `num_club` (`num_club`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `licencie`
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS `participation` (
   `date_inscription` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`num_equipe`,`num_evenement`),
   KEY `num_evenement` (`num_evenement`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `participation`
@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS `responsableclub` (
   `date_prise_poste` date DEFAULT NULL,
   PRIMARY KEY (`num_user`),
   KEY `num_club` (`num_club`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `responsableclub`
@@ -321,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `actif` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`num_user`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `utilisateur`
