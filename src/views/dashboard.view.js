@@ -7,6 +7,8 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+const { renderHotbar } = require('./hotbar.view');
+
 function getRoleLabel(role) {
   const labels = {
     coach: 'Coach',
@@ -64,10 +66,7 @@ function renderDashboardPage({ user }) {
 <body>
   <header class="topbar">
     <h1 class="logo">AngeMa Volley</h1>
-    <nav class="menu" aria-label="Navigation principale">
-      <a href="/">Accueil</a>
-      <a href="/dashboard">Dashboard</a>
-    </nav>
+    ${renderHotbar(user)}
   </header>
 
   <main class="page">

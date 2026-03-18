@@ -5,6 +5,7 @@ const session = require('express-session');
 
 const homeRoutes = require('./routes/home.routes');
 const authRoutes = require('./routes/auth.routes');
+const equipeRoutes = require('./routes/equipe.routes');
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.use(
 
 app.use('/', homeRoutes);
 app.use('/', authRoutes);
+app.use('/equipe', equipeRoutes);
 
 module.exports = app;

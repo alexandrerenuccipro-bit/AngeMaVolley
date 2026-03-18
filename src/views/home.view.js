@@ -7,9 +7,12 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+const { renderHotbar } = require('./hotbar.view');
+
 function renderHomePage({
   title,
-  message
+  message,
+  user
 }) {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -22,11 +25,7 @@ function renderHomePage({
 <body>
   <header class="topbar">
     <h1 class="logo">${escapeHtml(title)}</h1>
-    <nav class="menu" aria-label="Navigation principale">
-      <a href="#">Équipe</a>
-      <a href="#">Matchs</a>
-      <a href="#">Entraînements</a>
-    </nav>
+    ${renderHotbar(user)}
   </header>
 
   <main class="page">
@@ -35,7 +34,7 @@ function renderHomePage({
       <h2>Bienvenue sur <span>${escapeHtml(title)}</span></h2>
       <p>${escapeHtml(message)}</p>
       <div class="hero-actions">
-        <a href="/connexion" class="cta">Connexion</a>
+        ${user ? `<a href="/dashboard" class="cta">Accéder au Dashboard</a>` : `<a href="/connexion" class="cta">Connexion</a>`}
         <a href="#" class="cta cta-outline">Voir le calendrier</a>
       </div>
     </section>
