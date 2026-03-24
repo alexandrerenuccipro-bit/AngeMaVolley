@@ -125,6 +125,7 @@ function renderEquipePage(equipes, user) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Équipes - AngeMa Volley</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme-toggle.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -171,6 +172,7 @@ function renderDetailEquipe(equipe, joueurs, user) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(equipe.nom)} - AngeMa Volley</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme-toggle.js" defer></script>
 </head>
 <body>
   <header class="topbar">

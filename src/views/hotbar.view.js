@@ -13,6 +13,10 @@ function renderHotbar(user) {
       <a href="/equipe">Équipe</a>
       <a href="#">Matchs</a>
       <a href="#">Entraînements</a>
+      <label class="switch" for="theme-switch" aria-label="Activer le mode sombre">
+        <input id="theme-switch" type="checkbox" role="switch" aria-label="Activer le mode sombre">
+        <span class="slider" aria-hidden="true"></span>
+      </label>
       <a href="/dashboard" class="user-link">${escapeHtml(user.prenom)}</a>
     </nav>`;
   }
@@ -20,6 +24,10 @@ function renderHotbar(user) {
       <a href="/equipe">Équipe</a>
       <a href="#">Matchs</a>
       <a href="#">Entraînements</a>
+      <label class="switch" for="theme-switch" aria-label="Activer le mode sombre">
+        <input id="theme-switch" type="checkbox" role="switch" aria-label="Activer le mode sombre">
+        <span class="slider" aria-hidden="true"></span>
+      </label>
       <a href="/connexion" class="cta-btn">Connexion</a>
     </nav>`;
 }
