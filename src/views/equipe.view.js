@@ -11,106 +11,84 @@ function escapeHtml(value) {
 
 function getCategoryLabel(category) {
   const labels = {
-    senior: 'Senior',
-    junior: 'Junior',
-    cadet: 'Cadet',
-    minime: 'Minime'
+    senior: 'Senior'
   };
   return labels[category] || category;
 }
 
 function getCategoryColor(category) {
   const colors = {
-    senior: '#3b82f6',
-    junior: '#8b5cf6',
-    cadet: '#ec4899',
-    minime: '#f59e0b'
+    senior: '#3b82f6'
   };
-  return colors[category] || '#60a5fa';
+  return colors[category] || '#3b82f6';
 }
 
 function renderListeEquipes(equipes, user) {
-  const equipesGroupees = {};
-  
+  let html = `
+    <section class="category-section">
+      <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
+        Équipes
+      </h3>
+      <div class="equipes-grid">
+  `;
+
   equipes.forEach(equipe => {
-    if (!equipesGroupees[equipe.categorie]) {
-      equipesGroupees[equipe.categorie] = [];
-    }
-    equipesGroupees[equipe.categorie].push(equipe);
-  });
-
-  const categories = ['senior', 'junior', 'cadet', 'minime'];
-  let html = '';
-
-  categories.forEach(cat => {
-    if (equipesGroupees[cat]) {
-      html += `
-      <section class="category-section">
-        <h3 class="category-title" style="color: ${getCategoryColor(cat)}">
-          ${getCategoryLabel(cat)}
-        </h3>
-        <div class="equipes-grid">
-      `;
-
-      equipesGroupees[cat].forEach(equipe => {
-        html += `
-          <article class="equipe-card" onclick="location.href='/equipe/${equipe.num_equipe}';" style="cursor: pointer;">
-            <div class="equipe-header">
-              <h4>${escapeHtml(equipe.nom)}</h4>
-              <div class="equipe-badge" style="background-color: ${getCategoryColor(equipe.categorie)}; color: white;">
-                ${getCategoryLabel(equipe.categorie)}
-              </div>
-            </div>
-            
-            <div class="equipe-info">
-              <div class="info-row">
-                <span class="label">Club:</span>
-                <span>${escapeHtml(equipe.nom_club)}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Ville:</span>
-                <span>${escapeHtml(equipe.ville || '-')}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Couleur:</span>
-                <div class="color-swatch" style="background-color: ${escapeHtml(equipe.couleur_maillot)};"></div>
-              </div>
-            </div>
-
-            <div class="equipe-stats">
-              <div class="stat-item">
-                <span class="stat-value">${equipe.nb_joueurs}</span>
-                <span class="stat-label">Joueurs</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">${equipe.nb_joueurs_max}</span>
-                <span class="stat-label">Max</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">${equipe.coach_prenom ? '✓' : '—'}</span>
-                <span class="stat-label">Coach</span>
-              </div>
-            </div>
-
-            ${equipe.coach_prenom ? `
-              <div class="equipe-coach">
-                <strong>Coach:</strong> ${escapeHtml(equipe.coach_prenom)} ${escapeHtml(equipe.coach_nom)}
-              </div>
-            ` : ''}
-
-            <div class="equipe-footer">
-              <small>Créée le ${new Date(equipe.date_creation).toLocaleDateString('fr-FR')}</small>
-            </div>
-          </article>
-        `;
-      });
-
-      html += `
+    html += `
+      <article class="equipe-card" onclick="location.href='/equipe/${equipe.num_equipe}';" style="cursor: pointer;">
+        <div class="equipe-header">
+          <h4>${escapeHtml(equipe.nom)}</h4>
+          <div class="equipe-badge" style="background-color: ${getCategoryColor(equipe.categorie)}; color: white;">
+            ${getCategoryLabel(equipe.categorie)}
+          </div>
         </div>
-      </section>
-      `;
-    }
+
+        <div class="equipe-info">
+          <div class="info-row">
+            <span class="label">Club:</span>
+            <span>${escapeHtml(equipe.nom_club)}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Ville:</span>
+            <span>${escapeHtml(equipe.ville || '-')}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Couleur:</span>
+            <div class="color-swatch" style="background-color: ${escapeHtml(equipe.couleur_maillot)};"></div>
+          </div>
+        </div>
+
+        <div class="equipe-stats">
+          <div class="stat-item">
+            <span class="stat-value">${equipe.nb_joueurs}</span>
+            <span class="stat-label">Joueurs</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${equipe.nb_joueurs_max}</span>
+            <span class="stat-label">Max</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${equipe.coach_prenom ? '✓' : '—'}</span>
+            <span class="stat-label">Coach</span>
+          </div>
+        </div>
+
+        ${equipe.coach_prenom ? `
+          <div class="equipe-coach">
+            <strong>Coach:</strong> ${escapeHtml(equipe.coach_prenom)} ${escapeHtml(equipe.coach_nom)}
+          </div>
+        ` : ''}
+
+        <div class="equipe-footer">
+          <small>Créée le ${new Date(equipe.date_creation).toLocaleDateString('fr-FR')}</small>
+        </div>
+      </article>
+    `;
   });
+
+  html += `
+      </div>
+    </section>
+  `;
 
   return html;
 }
@@ -129,7 +107,7 @@ function renderEquipePage(equipes, user) {
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">AngeMa Volley</h1>
+    <a class="logo" href="/">AngeMa Volley</a>
     ${renderHotbar(user)}
   </header>
 
@@ -137,7 +115,7 @@ function renderEquipePage(equipes, user) {
     <section class="hero-card">
       <p class="tag">Gestion d'équipe</p>
       <h2>Les Équipes</h2>
-      <p>Découvrez tous nos équipes classées par catégorie. Cliquez sur une équipe pour voir ses détails et ses joueurs.</p>
+      <p>Découvrez toutes nos équipes. Cliquez sur une équipe pour voir ses détails et ses joueurs.</p>
     </section>
 
     ${equipesHtml}
@@ -147,6 +125,16 @@ function renderEquipePage(equipes, user) {
 }
 
 function renderDetailEquipe(equipe, joueurs, user) {
+  const coachEmailItem = equipe.coach_email
+    ? `<li><strong>Email:</strong> ${escapeHtml(equipe.coach_email)}</li>`
+    : '';
+  const clubEmailItem = equipe.club_email
+    ? `<li><strong>Email:</strong> ${escapeHtml(equipe.club_email)}</li>`
+    : '';
+  const clubTelephoneItem = equipe.club_telephone
+    ? `<li><strong>Tél:</strong> ${escapeHtml(equipe.club_telephone)}</li>`
+    : '';
+
   const joueursHtml = joueurs.map(joueur => `
     <tr>
       <td>${escapeHtml(joueur.numero_maillot || '—')}</td>
@@ -176,7 +164,7 @@ function renderDetailEquipe(equipe, joueurs, user) {
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">AngeMa Volley</h1>
+    <a class="logo" href="/">AngeMa Volley</a>
     ${renderHotbar(user)}
   </header>
 
@@ -222,7 +210,7 @@ function renderDetailEquipe(equipe, joueurs, user) {
         <h3>Entraîneur</h3>
         <ul style="list-style: none; padding: 0;">
           <li><strong>Nom:</strong> ${escapeHtml(equipe.coach_prenom)} ${escapeHtml(equipe.coach_nom)}</li>
-          ${equipe.club_email ? `<li><strong>Email:</strong> ${escapeHtml(equipe.coach_email)}</li>` : ''}
+          ${coachEmailItem}
         </ul>
       </article>
       ` : `
@@ -236,8 +224,8 @@ function renderDetailEquipe(equipe, joueurs, user) {
         <h3>Contact Club</h3>
         <ul style="list-style: none; padding: 0;">
           <li><strong>Club:</strong> ${escapeHtml(equipe.nom_club)}</li>
-          ${equipe.club_email ? `<li><strong>Email:</strong> ${escapeHtml(equipe.club_email)}</li>` : ''}
-          ${equipe.club_telephone ? `<li><strong>Tél:</strong> ${escapeHtml(equipe.club_telephone)}</li>` : ''}
+          ${clubEmailItem}
+          ${clubTelephoneItem}
         </ul>
       </article>
     </section>

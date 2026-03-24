@@ -2,37 +2,37 @@
    VARIABLES & RESET STYLES
    ============================================ */
 :root {
-  --primary: #7a4b2a;
-  --primary-hover: #60371e;
-  --accent: #9a6b44;
-  --accent-hover: #7e5232;
-  --light-bg: #efe1cf;
-  --card-bg: #e6d3bb;
-  --topbar-bg: #d6bca0;
-  --dark-text: #352012;
-  --secondary-text: #674a35;
-  --muted-text: #876651;
-  --border: #c5a684;
-  --input-bg: #f9f0e4;
-  --text-on-primary: #fffaf3;
-  --text-on-accent: #fff7ec;
+  --primary: #111111;
+  --primary-hover: #000000;
+  --accent: #1a1a1a;
+  --accent-hover: #0a0a0a;
+  --light-bg: #ffffff;
+  --card-bg: #ffffff;
+  --topbar-bg: #ffffff;
+  --dark-text: #111111;
+  --secondary-text: #2f2f2f;
+  --muted-text: #5a5a5a;
+  --border: #dcdcdc;
+  --input-bg: #ffffff;
+  --text-on-primary: #ffffff;
+  --text-on-accent: #ffffff;
   --error: #fca5a5;
   --error-bg: #7f1d1d;
   --transition: 0.2s ease;
-  --user-link-bg: rgba(122, 75, 42, 0.14);
-  --user-link-hover-bg: rgba(122, 75, 42, 0.24);
-  --topbar-shadow: 0 1px 3px rgba(63, 40, 24, 0.16);
-  --surface-shadow: 0 1px 3px rgba(63, 40, 24, 0.12);
-  --surface-shadow-strong: 0 6px 16px rgba(63, 40, 24, 0.16);
-  --focus-ring: rgba(122, 75, 42, 0.22);
-  --button-shadow: rgba(122, 75, 42, 0.25);
-  --soft-accent-bg: rgba(154, 107, 68, 0.09);
-  --soft-accent-bg-strong: rgba(154, 107, 68, 0.16);
-  --coach-bg: rgba(122, 75, 42, 0.12);
-  --coach-border: #7a4b2a;
-  --switch-track: #9f7956;
-  --switch-track-active: #7a4b2a;
-  --switch-knob: #f9f0e4;
+  --user-link-bg: rgba(0, 0, 0, 0.06);
+  --user-link-hover-bg: rgba(0, 0, 0, 0.12);
+  --topbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --surface-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --surface-shadow-strong: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --focus-ring: rgba(0, 0, 0, 0.15);
+  --button-shadow: rgba(0, 0, 0, 0.2);
+  --soft-accent-bg: rgba(0, 0, 0, 0.04);
+  --soft-accent-bg-strong: rgba(0, 0, 0, 0.08);
+  --coach-bg: rgba(0, 0, 0, 0.06);
+  --coach-border: #111111;
+  --switch-track: #cfcfcf;
+  --switch-track-active: #111111;
+  --switch-knob: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -219,7 +219,7 @@ body {
   color: var(--primary);
 }
 
-.hero-card p {
+.hero-card p:not(.tag) {
   margin: 0 0 1.5rem;
   line-height: 1.7;
   color: var(--secondary-text);
@@ -513,7 +513,7 @@ body {
   border-radius: 50%;
   left: 10%;
   bottom: 15%;
-  box-shadow: inset 8px -4px 0 0 #fff000;
+  box-shadow: inset 8px -4px 0 0 #ffffff;
   background: var(--background);
   transition: 0.5s;
 }
@@ -524,7 +524,7 @@ body {
 
 .switch input:checked + .slider:before {
   transform: translateX(100%);
-  box-shadow: inset 15px -4px 0 15px #fff000;
+  box-shadow: inset 15px -4px 0 15px #ffffff;
 }
 
 .switch input:focus-visible + .slider {

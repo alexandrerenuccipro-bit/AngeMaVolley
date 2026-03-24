@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const { findActiveUserByEmail } = require('../models/auth.model');
 const { renderLoginPage } = require('../views/auth.view');
 const { renderDashboardPage } = require('../views/dashboard.view');
@@ -44,7 +44,8 @@ exports.login = async (req, res) => {
       nom: user.nom,
       prenom: user.prenom,
       email: user.email,
-      role: user.role
+      role: user.role,
+      estAdmin: Boolean(user.est_admin)
     };
 
     return res.redirect('/dashboard');

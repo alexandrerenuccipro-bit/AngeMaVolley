@@ -25,7 +25,7 @@ function renderHomePage({
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">${escapeHtml(title)}</h1>
+    <a class="logo" href="/">${escapeHtml(title)}</a>
     ${renderHotbar(user)}
   </header>
 

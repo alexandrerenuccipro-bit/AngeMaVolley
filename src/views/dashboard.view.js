@@ -9,18 +9,28 @@ function escapeHtml(value) {
 
 const { renderHotbar } = require('./hotbar.view');
 
-function getRoleLabel(role) {
+function getRoleLabel(user) {
+  if (user.estAdmin) {
+    return 'Admin';
+  }
+
   const labels = {
     coach: 'Coach',
     licencie: 'Joueur / Licencié',
-    administrateur: 'Administrateur',
     responsable_club: 'Responsable de club'
   };
 
-  return labels[role] || role;
+  return labels[user.role] || user.role;
 }
 
-function getRoleCards(role) {
+function getRoleCards(user) {
+  if (user.estAdmin) {
+    return [
+      { title: 'Supervision plateforme', text: 'Surveille les comptes et permissions.' },
+      { title: 'Validation licences', text: 'Contrôle les activations et les inscriptions.' }
+    ];
+  }
+
   const cardsByRole = {
     coach: [
       { title: 'Séance du jour', text: 'Planifie les exercices et la charge de travail.' },
@@ -30,21 +40,17 @@ function getRoleCards(role) {
       { title: 'Mes entraînements', text: 'Retrouve ton planning personnel.' },
       { title: 'Mes performances', text: 'Consulte tes statistiques récentes.' }
     ],
-    administrateur: [
-      { title: 'Supervision plateforme', text: 'Surveille les comptes et permissions.' },
-      { title: 'Modération', text: 'Valide les inscriptions et licences.' }
-    ],
     responsable_club: [
       { title: 'Gestion club', text: 'Mets à jour les informations du club.' },
       { title: 'Gestion équipes', text: 'Affecte les joueurs et encadrants.' }
     ]
   };
 
-  return cardsByRole[role] || [{ title: 'Tableau de bord', text: 'Bienvenue sur ton espace.' }];
+  return cardsByRole[user.role] || [{ title: 'Tableau de bord', text: 'Bienvenue sur ton espace.' }];
 }
 
 function renderDashboardPage({ user }) {
-  const cardsMarkup = getRoleCards(user.role)
+  const cardsMarkup = getRoleCards(user)
     .map(
       (card) => `
       <article class="info-card">
@@ -66,15 +72,15 @@ function renderDashboardPage({ user }) {
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">AngeMa Volley</h1>
+    <a class="logo" href="/">AngeMa Volley</a>
     ${renderHotbar(user)}
   </header>
 
   <main class="page">
     <section class="hero-card">
-      <p class="tag">Espace connecté</p>
+      <p class="tag">Espace personnel</p>
       <h2>Bienvenue ${escapeHtml(user.prenom)} ${escapeHtml(user.nom)}</h2>
-      <p>Rôle connecté: <strong>${escapeHtml(getRoleLabel(user.role))}</strong></p>
+      <p>Rôle: <strong>${escapeHtml(getRoleLabel(user))}</strong></p>
       <form method="POST" action="/deconnexion">
         <button type="submit" class="cta cta-outline">Se déconnecter</button>
       </form>

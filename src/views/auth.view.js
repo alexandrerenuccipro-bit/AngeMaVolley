@@ -23,7 +23,7 @@ function renderLoginPage({ error, email }) {
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">AngeMa Volley</h1>
+    <a class="logo" href="/">AngeMa Volley</a>
     <nav class="menu" aria-label="Navigation principale">
       <a href="/">Accueil</a>
     </nav>
