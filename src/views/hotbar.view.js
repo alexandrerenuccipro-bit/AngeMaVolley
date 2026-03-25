@@ -11,8 +11,7 @@ function renderHotbar(user) {
   if (user) {
     return `<nav class="menu" aria-label="Navigation principale">
       <a href="/equipe">Équipe</a>
-      <a href="#">Matchs</a>
-      <a href="#">Entraînements</a>
+      <a href="/calendrier">Calendrier</a>
       <label class="switch" for="theme-switch" aria-label="Activer le mode sombre">
         <input id="theme-switch" type="checkbox" role="switch" aria-label="Activer le mode sombre">
         <span class="slider" aria-hidden="true"></span>
@@ -22,8 +21,7 @@ function renderHotbar(user) {
   }
   return `<nav class="menu" aria-label="Navigation principale">
       <a href="/equipe">Équipe</a>
-      <a href="#">Matchs</a>
-      <a href="#">Entraînements</a>
+      <a href="/calendrier">Calendrier</a>
       <label class="switch" for="theme-switch" aria-label="Activer le mode sombre">
         <input id="theme-switch" type="checkbox" role="switch" aria-label="Activer le mode sombre">
         <span class="slider" aria-hidden="true"></span>

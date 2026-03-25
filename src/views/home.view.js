@@ -36,7 +36,7 @@ function renderHomePage({
       <p>${escapeHtml(message)}</p>
       <div class="hero-actions">
         ${user ? `<a href="/dashboard" class="cta">Accéder au Dashboard</a>` : `<a href="/connexion" class="cta">Connexion</a>`}
-        <a href="#" class="cta cta-outline">Voir le calendrier</a>
+        <a href="/calendrier" class="cta cta-outline">Voir le calendrier</a>
       </div>
     </section>
 

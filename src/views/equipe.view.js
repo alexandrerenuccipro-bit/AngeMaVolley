@@ -23,7 +23,7 @@ function getCategoryColor(category) {
   return colors[category] || '#3b82f6';
 }
 
-function renderListeEquipes(equipes, user) {
+function renderListeEquipes(equipes) {
   let html = `
     <section class="category-section">
       <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
@@ -94,7 +94,7 @@ function renderListeEquipes(equipes, user) {
 }
 
 function renderEquipePage(equipes, user) {
-  const equipesHtml = renderListeEquipes(equipes, user);
+  const equipesHtml = renderListeEquipes(equipes);
 
   return `<!DOCTYPE html>
 <html lang="fr">
