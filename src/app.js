@@ -7,7 +7,8 @@ const homeRoutes       = require('./routes/home.routes');
 const authRoutes       = require('./routes/auth.routes');
 const equipeRoutes     = require('./routes/equipe.routes');
 const calendrierRoutes = require('./routes/calendrier.routes');
-const adminRoutes      = require('./routes/admin.routes');   // ← NOUVEAU
+const adminRoutes      = require('./routes/admin.routes');
+const joueurRoutes     = require('./routes/joueur.routes');  // ← NOUVEAU
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/',           homeRoutes);
 app.use('/',           authRoutes);
 app.use('/equipe',     equipeRoutes);
 app.use('/calendrier', calendrierRoutes);
-app.use('/admin',      adminRoutes);   // ← NOUVEAU
+app.use('/admin',      adminRoutes);
+app.use('/joueur',     joueurRoutes);   // ← NOUVEAU
 
 module.exports = app;
