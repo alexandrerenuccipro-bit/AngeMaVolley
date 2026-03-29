@@ -24,26 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `administrateur`
---
-
-DROP TABLE IF EXISTS `administrateur`;
-CREATE TABLE IF NOT EXISTS `administrateur` (
-  `num_user` int NOT NULL,
-  `niveau_acces` enum('super_admin','moderateur') DEFAULT 'moderateur',
-  PRIMARY KEY (`num_user`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `administrateur`
---
-
-INSERT INTO `administrateur` (`num_user`, `niveau_acces`) VALUES
-(1, 'super_admin');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `club`
 --
 
@@ -104,7 +84,7 @@ DROP TABLE IF EXISTS `equipe`;
 CREATE TABLE IF NOT EXISTS `equipe` (
   `num_equipe` int NOT NULL AUTO_INCREMENT,
   `nom` varchar(100) NOT NULL,
-  `categorie` enum('senior','junior','cadet','minime') NOT NULL,
+  `categorie` enum('senior') NOT NULL,
   `num_club` int NOT NULL,
   `num_coach` int DEFAULT NULL,
   `date_creation` date DEFAULT NULL,
@@ -113,16 +93,14 @@ CREATE TABLE IF NOT EXISTS `equipe` (
   PRIMARY KEY (`num_equipe`),
   KEY `num_club` (`num_club`),
   KEY `num_coach` (`num_coach`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `equipe`
 --
 
 INSERT INTO `equipe` (`num_equipe`, `nom`, `categorie`, `num_club`, `num_coach`, `date_creation`, `couleur_maillot`, `nb_joueurs_max`) VALUES
-(1, 'AS Marseille Nord Seniors', 'senior', 1, 3, '2010-06-01', 'Bleu/Blanc', 25),
-(2, 'FC Lyon Est Juniors', 'junior', 2, 8, '2015-03-10', 'Rouge/Blanc', 20),
-(3, 'Sporting Paris Cadets', 'cadet', 3, NULL, '2018-09-01', 'Vert/Noir', 18);
+(1, 'AS Marseille Nord Seniors', 'senior', 1, 3, '2010-06-01', 'Bleu/Blanc', 25);
 
 -- --------------------------------------------------------
 
@@ -147,10 +125,7 @@ CREATE TABLE IF NOT EXISTS `equipe_licencie` (
 
 INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`, `capitaine`) VALUES
 (1, 4, '2022-09-01', 9, 1),
-(1, 5, '2023-01-15', 10, 0),
-(2, 6, '2021-09-01', 4, 1),
-(2, 7, '2022-06-01', 1, 0),
-(3, 10, '2024-09-01', 7, 0);
+(1, 5, '2023-01-15', 10, 0);
 
 -- --------------------------------------------------------
 
@@ -271,12 +246,8 @@ CREATE TABLE IF NOT EXISTS `participation` (
 
 INSERT INTO `participation` (`num_equipe`, `num_evenement`, `score`, `resultat`, `date_inscription`) VALUES
 (1, 1, '2-1', 'victoire', '2026-03-04 00:38:25'),
-(2, 1, '1-2', 'defaite', '2026-03-04 00:38:25'),
 (1, 3, NULL, NULL, '2026-03-04 00:38:25'),
-(2, 3, NULL, NULL, '2026-03-04 00:38:25'),
-(3, 3, NULL, NULL, '2026-03-04 00:38:25'),
-(1, 4, NULL, NULL, '2026-03-04 00:38:25'),
-(2, 4, NULL, NULL, '2026-03-04 00:38:25');
+(1, 4, NULL, NULL, '2026-03-04 00:38:25');
 
 -- --------------------------------------------------------
 
@@ -317,7 +288,8 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `telephone` varchar(20) DEFAULT NULL,
   `date_naissance` date DEFAULT NULL,
   `date_inscription` datetime DEFAULT CURRENT_TIMESTAMP,
-  `role` enum('administrateur','responsable_club','coach','licencie') NOT NULL,
+  `role` enum('responsable_club','coach','licencie') NOT NULL,
+  `est_admin` tinyint(1) DEFAULT '0',
   `actif` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`num_user`),
   UNIQUE KEY `email` (`email`)
@@ -327,17 +299,178 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 -- Dumping data for table `utilisateur`
 --
 
-INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `date_naissance`, `date_inscription`, `role`, `actif`) VALUES
-(1, 'Martin', 'Sophie', 'sophie.martin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0601020304', '1985-03-12', '2026-03-04 00:38:24', 'administrateur', 1),
-(2, 'Dupont', 'Pierre', 'pierre.dupont@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0602030405', '1978-07-22', '2026-03-04 00:38:24', 'responsable_club', 1),
-(3, 'Bernard', 'Lucas', 'lucas.bernard@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0603040506', '1990-11-05', '2026-03-04 00:38:24', 'coach', 1),
-(4, 'Leroy', 'Emma', 'emma.leroy@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0604050607', '1999-01-18', '2026-03-04 00:38:24', 'licencie', 1),
-(5, 'Moreau', 'Hugo', 'hugo.moreau@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0605060708', '2001-06-30', '2026-03-04 00:38:24', 'licencie', 1),
-(6, 'Petit', 'Chloé', 'chloe.petit@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0606070809', '2000-09-14', '2026-03-04 00:38:24', 'licencie', 1),
-(7, 'Simon', 'Théo', 'theo.simon@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0607080910', '1998-04-02', '2026-03-04 00:38:24', 'licencie', 1),
-(8, 'Laurent', 'Julie', 'julie.laurent@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0608091011', '1995-12-25', '2026-03-04 00:38:24', 'coach', 1),
-(9, 'Michel', 'Antoine', 'antoine.michel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0609101112', '1980-08-17', '2026-03-04 00:38:24', 'responsable_club', 1),
-(10, 'Garcia', 'Nina', 'nina.garcia@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0610111213', '2003-02-28', '2026-03-04 00:38:24', 'licencie', 1);
+INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `date_naissance`, `date_inscription`, `role`, `est_admin`, `actif`) VALUES
+(1, 'Renucci', 'Alexandre', 'alexandre.renucci.pro@gmail.com', 'Alexandre', '0674103121', '2005-11-29', '2026-03-04 00:38:24', 'responsable_club', 1, 1),
+(2, 'Dupont', 'Pierre', 'pierre.dupont@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0602030405', '1978-07-22', '2026-03-04 00:38:24', 'responsable_club', 0, 1),
+(3, 'Bernard', 'Lucas', 'lucas.bernard@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0603040506', '1990-11-05', '2026-03-04 00:38:24', 'coach', 0, 1),
+(4, 'Leroy', 'Emma', 'emma.leroy@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0604050607', '1999-01-18', '2026-03-04 00:38:24', 'licencie', 0, 1),
+(5, 'Moreau', 'Hugo', 'hugo.moreau@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0605060708', '2001-06-30', '2026-03-04 00:38:24', 'licencie', 0, 1),
+(6, 'Petit', 'Chloé', 'chloe.petit@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0606070809', '2000-09-14', '2026-03-04 00:38:24', 'licencie', 0, 1),
+(7, 'Simon', 'Théo', 'theo.simon@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0607080910', '1998-04-02', '2026-03-04 00:38:24', 'licencie', 0, 1),
+(8, 'Laurent', 'Julie', 'julie.laurent@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0608091011', '1995-12-25', '2026-03-04 00:38:24', 'coach', 0, 1),
+(9, 'Michel', 'Antoine', 'antoine.michel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0609101112', '1980-08-17', '2026-03-04 00:38:24', 'responsable_club', 0, 1),
+(10, 'Garcia', 'Nina', 'nina.garcia@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0610111213', '2003-02-28', '2026-03-04 00:38:24', 'licencie', 0, 1);
+
+-- --------------------------------------------------------
+-- Jeu de donnees etendu (coherent et volumineux)
+-- --------------------------------------------------------
+
+INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adresse`, `ville`, `code_postal`, `date_creation`, `site_web`) VALUES
+(4, 'Volley Nantes Atlantique', 'Loire-Atlantique', '0240404040', 'contact@vna.fr', '22 Rue des Sports', 'Nantes', '44000', '2008-09-01', 'https://vna.fr'),
+(5, 'Toulouse Volley Union', 'Haute-Garonne', '0560505050', 'contact@tvu.fr', '14 Avenue des Arenes', 'Toulouse', '31000', '2011-02-12', 'https://tvu.fr'),
+(6, 'Lille Metropole Volley', 'Nord', '0320606060', 'contact@lmv.fr', '9 Boulevard Faidherbe', 'Lille', '59000', '2005-06-18', 'https://lmv.fr'),
+(7, 'Nice Cote Volley', 'Alpes-Maritimes', '0490707070', 'contact@ncv.fr', '30 Promenade des Sports', 'Nice', '06000', '2013-04-20', 'https://ncv.fr'),
+(8, 'Bordeaux Gironde Volley', 'Gironde', '0550808080', 'contact@bgv.fr', '6 Rue des Arenes', 'Bordeaux', '33000', '2009-01-09', 'https://bgv.fr');
+
+INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `date_naissance`, `date_inscription`, `role`, `est_admin`, `actif`) VALUES
+(11, 'Vidal', 'Claire', 'claire.vidal@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0611111111', '1984-11-18', '2026-03-04 10:10:00', 'responsable_club', 1, 1),
+(12, 'Durand', 'Camille', 'camille.durand@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0612121212', '1982-05-10', '2026-03-04 10:11:00', 'responsable_club', 0, 1),
+(13, 'Renaud', 'Julien', 'julien.renaud@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0613131313', '1986-09-22', '2026-03-04 10:12:00', 'responsable_club', 0, 1),
+(14, 'Morel', 'Amandine', 'amandine.morel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0614141414', '1981-12-01', '2026-03-04 10:13:00', 'responsable_club', 0, 1),
+(15, 'Lacroix', 'Thomas', 'thomas.lacroix@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0615151515', '1979-07-07', '2026-03-04 10:14:00', 'responsable_club', 0, 1),
+(16, 'Perrot', 'Nadine', 'nadine.perrot@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0616161616', '1983-02-23', '2026-03-04 10:15:00', 'responsable_club', 0, 1),
+(17, 'Noel', 'Aline', 'aline.noel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0617171717', '1989-03-14', '2026-03-04 10:16:00', 'coach', 0, 1),
+(18, 'Perrin', 'David', 'david.perrin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0618181818', '1991-12-03', '2026-03-04 10:17:00', 'coach', 0, 1),
+(19, 'Meyer', 'Laura', 'laura.meyer@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0619191919', '1993-07-28', '2026-03-04 10:18:00', 'coach', 0, 1),
+(20, 'Adam', 'Karim', 'karim.adam@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0620202020', '1988-01-12', '2026-03-04 10:19:00', 'coach', 0, 1),
+(21, 'Chevalier', 'Lina', 'lina.chevalier@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0621212121', '1990-05-04', '2026-03-04 10:20:00', 'coach', 0, 1),
+(22, 'Legrand', 'Yanis', 'yanis.legrand@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0622222222', '1987-09-19', '2026-03-04 10:21:00', 'coach', 0, 1),
+(23, 'Aubert', 'Sonia', 'sonia.aubert@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0623232323', '1992-10-11', '2026-03-04 10:22:00', 'coach', 0, 1),
+(24, 'Briand', 'Leo', 'leo.briand@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0624242424', '1994-06-15', '2026-03-04 10:23:00', 'coach', 0, 1),
+(25, 'Guerin', 'Maxime', 'maxime.guerin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0625252525', '2000-01-11', '2026-03-04 10:24:00', 'licencie', 0, 1),
+(26, 'Andre', 'Nora', 'nora.andre@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0626262626', '1999-06-19', '2026-03-04 10:25:00', 'licencie', 0, 1),
+(27, 'Boyer', 'Ines', 'ines.boyer@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0627272727', '2002-04-08', '2026-03-04 10:26:00', 'licencie', 0, 1),
+(28, 'Roux', 'Nolan', 'nolan.roux@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0628282828', '2001-10-30', '2026-03-04 10:27:00', 'licencie', 0, 1),
+(29, 'Marchal', 'Sarah', 'sarah.marchal@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0629292929', '2005-02-16', '2026-03-04 10:28:00', 'licencie', 0, 1),
+(30, 'Collet', 'Evan', 'evan.collet@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0630303030', '2006-11-02', '2026-03-04 10:29:00', 'licencie', 0, 1),
+(31, 'Lopez', 'Jade', 'jade.lopez@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0631313131', '2007-08-21', '2026-03-04 10:30:00', 'licencie', 0, 1),
+(32, 'Gilbert', 'Mael', 'mael.gilbert@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0632323232', '2008-09-17', '2026-03-04 10:31:00', 'licencie', 0, 1),
+(33, 'Bonnet', 'Lou', 'lou.bonnet@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0633333333', '2009-12-09', '2026-03-04 10:32:00', 'licencie', 0, 1),
+(34, 'Masson', 'Theo', 'theo.masson@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0634343434', '2008-03-26', '2026-03-04 10:33:00', 'licencie', 0, 1),
+(35, 'Lemoine', 'Anais', 'anais.lemoine@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0635353535', '2010-05-05', '2026-03-04 10:34:00', 'licencie', 0, 1),
+(36, 'Roche', 'Baptiste', 'baptiste.roche@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0636363636', '2011-01-29', '2026-03-04 10:35:00', 'licencie', 0, 1),
+(37, 'Clement', 'Nora', 'nora.clement@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0637373737', '1998-07-01', '2026-03-04 10:36:00', 'licencie', 0, 1),
+(38, 'Barbier', 'Axel', 'axel.barbier@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0638383838', '1997-12-13', '2026-03-04 10:37:00', 'licencie', 0, 1),
+(39, 'Renard', 'Mila', 'mila.renard@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0639393939', '1999-09-09', '2026-03-04 10:38:00', 'licencie', 0, 1),
+(40, 'Garnier', 'Yohan', 'yohan.garnier@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0640404040', '2007-06-04', '2026-03-04 10:39:00', 'licencie', 0, 1),
+(41, 'Nguyen', 'Lola', 'lola.nguyen@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0641414141', '2008-02-25', '2026-03-04 10:40:00', 'licencie', 0, 1),
+(42, 'Pascal', 'Eliot', 'eliot.pascal@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0642424242', '2001-11-17', '2026-03-04 10:41:00', 'licencie', 0, 1),
+(43, 'Lefevre', 'Morgane', 'morgane.lefevre@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0643434343', '2002-08-03', '2026-03-04 10:42:00', 'licencie', 0, 1),
+(44, 'Morin', 'Sacha', 'sacha.morin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0644444444', '2004-03-09', '2026-03-04 10:43:00', 'licencie', 0, 1),
+(45, 'Julien', 'Agathe', 'agathe.julien@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0645454545', '2005-01-05', '2026-03-04 10:44:00', 'licencie', 0, 1);
+
+INSERT INTO `responsableclub` (`num_user`, `num_club`, `date_prise_poste`) VALUES
+(12, 4, '2021-09-01'),
+(13, 5, '2022-01-10'),
+(14, 6, '2020-06-15'),
+(15, 7, '2019-11-08'),
+(16, 8, '2023-02-01');
+
+INSERT INTO `coach` (`num_user`, `specialite`, `diplome`, `annees_experience`) VALUES
+(17, 'Reception-defense', 'DEJEPS Volley', 9),
+(18, 'Formation jeunes', 'BPJEPS APT', 6),
+(19, 'Bloc et contre-attaque', 'DEJEPS Volley', 11),
+(20, 'Condition physique', 'Licence STAPS', 7),
+(21, 'Service tactique', 'DEJEPS Volley', 8),
+(22, 'Analyse video', 'Master Preparation Mentale', 10),
+(23, 'Technique individuelle', 'BPJEPS APT', 5),
+(24, 'Coordination minimes', 'CQP ALS', 4);
+
+INSERT INTO `equipe` (`num_equipe`, `nom`, `categorie`, `num_club`, `num_coach`, `date_creation`, `couleur_maillot`, `nb_joueurs_max`) VALUES
+(4, 'Volley Nantes A Seniors', 'senior', 4, 17, '2022-09-01', '#1e40af', 20),
+(6, 'Toulouse Elite Seniors', 'senior', 5, 19, '2021-09-01', '#059669', 20),
+(8, 'Lille Nord Seniors', 'senior', 6, 21, '2019-09-01', '#0ea5e9', 20),
+(10, 'Nice Azur Seniors', 'senior', 7, 23, '2020-09-01', '#ef4444', 20),
+(12, 'Bordeaux Gironde A', 'senior', 8, 18, '2021-09-01', '#b45309', 20);
+
+INSERT INTO `licencie` (`num_user`, `statut`, `num_club`, `position`, `poids_kg`, `taille_cm`, `numero_securite_sociale`) VALUES
+(25, 'actif', 4, 'Passeur', 73.00, 181, NULL),
+(26, 'actif', 4, 'Central', 82.00, 192, NULL),
+(27, 'actif', 4, 'Attaquant', 69.00, 176, NULL),
+(28, 'actif', 4, 'Libero', 64.00, 171, NULL),
+(29, 'actif', 4, 'Passeur', 66.00, 174, NULL),
+(30, 'actif', 5, 'Attaquant', 71.00, 179, NULL),
+(31, 'actif', 5, 'Central', 74.00, 183, NULL),
+(32, 'inactif', 5, 'Libero', 61.00, 169, NULL),
+(33, 'actif', 5, 'Passeur', 68.00, 175, NULL),
+(34, 'actif', 5, 'Attaquant', 70.00, 178, NULL),
+(35, 'actif', 6, 'Central', 84.00, 194, NULL),
+(36, 'actif', 6, 'Attaquant', 72.00, 180, NULL),
+(37, 'suspendu', 6, 'Passeur', 70.00, 177, NULL),
+(38, 'actif', 6, 'Libero', 63.00, 168, NULL),
+(39, 'actif', 7, 'Attaquant', 67.00, 174, NULL),
+(40, 'actif', 7, 'Central', 76.00, 186, NULL),
+(41, 'actif', 7, 'Libero', 59.00, 165, NULL),
+(42, 'actif', 8, 'Passeur', 71.00, 179, NULL),
+(43, 'actif', 8, 'Attaquant', 74.00, 184, NULL),
+(44, 'actif', 8, 'Central', 78.00, 188, NULL),
+(45, 'actif', 8, 'Libero', 62.00, 167, NULL);
+
+INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`, `capitaine`) VALUES
+(4, 25, '2025-09-01', 2, 0),
+(4, 26, '2025-09-01', 5, 1),
+(4, 27, '2025-09-01', 9, 0),
+(6, 30, '2025-09-01', 8, 1),
+(6, 31, '2025-09-01', 6, 0),
+(6, 32, '2025-09-01', 12, 0),
+(8, 35, '2025-09-01', 14, 1),
+(8, 36, '2025-09-01', 15, 0),
+(10, 39, '2025-09-01', 16, 1),
+(10, 40, '2025-09-01', 18, 0),
+(12, 42, '2025-09-01', 17, 1),
+(12, 43, '2025-09-01', 19, 0);
+
+INSERT INTO `licence` (`num_licence`, `num_user`, `type`, `date_debut`, `date_fin`, `validee`, `num_validateur`, `date_validation`, `montant_cotisation`) VALUES
+(7, 25, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:00:00', 170.00),
+(8, 26, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:10:00', 170.00),
+(9, 27, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:20:00', 170.00),
+(10, 28, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:30:00', 165.00),
+(11, 29, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:00:00', 95.00),
+(12, 30, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:10:00', 170.00),
+(13, 31, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:20:00', 170.00),
+(14, 32, 'jeune', '2025-09-01', '2026-08-31', 0, NULL, NULL, 95.00),
+(15, 33, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:30:00', 95.00),
+(16, 34, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:40:00', 95.00),
+(17, 35, 'professionnel', '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:00:00', 340.00),
+(18, 36, 'professionnel', '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:10:00', 340.00),
+(19, 37, 'professionnel', '2025-09-01', '2026-08-31', 0, NULL, NULL, 340.00),
+(20, 38, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:20:00', 160.00),
+(21, 39, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:30:00', 165.00),
+(22, 40, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:40:00', 165.00),
+(23, 41, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:50:00', 90.00),
+(24, 42, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:00:00', 170.00),
+(25, 43, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:10:00', 170.00),
+(26, 44, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:20:00', 175.00),
+(27, 45, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:30:00', 90.00);
+
+INSERT INTO `evenement` (`num_evenement`, `type`, `date_debut`, `date_fin`, `lieu`, `adresse_lieu`, `description`, `nb_places_max`, `statut`, `createur`) VALUES
+(5, 'entrainement', '2026-04-02 19:00:00', '2026-04-02 21:00:00', 'Gymnase Beaulieu', '10 Rue Beaulieu, Nantes', 'Seance technique service et reception', 60, 'planifie', 17),
+(6, 'match', '2026-04-06 16:00:00', '2026-04-06 18:00:00', 'Palais des Sports', '1 Place du Sport, Toulouse', 'Championnat regional journee 14', 800, 'planifie', 12),
+(7, 'tournoi', '2026-04-20 09:00:00', '2026-04-20 19:00:00', 'Complexe Metropole', '25 Avenue Centrale, Lyon', 'Tournoi inter-clubs printemps 2026', 1200, 'planifie', 11),
+(8, 'match', '2026-03-10 14:00:00', '2026-03-10 16:00:00', 'Gymnase Atlantique', '22 Rue des Sports, Nantes', 'Match amical de preparation', 350, 'termine', 19),
+(9, 'entrainement', '2026-03-12 18:30:00', '2026-03-12 20:00:00', 'Salle du Lac', '7 Quai Nord, Marseille', 'Travail bloc defense', 40, 'en_cours', 21),
+(10, 'autre', '2026-05-05 18:00:00', '2026-05-05 20:30:00', 'Maison des Sports', '40 Rue du Stade, Toulouse', 'Reunion parents et presentation saison', 150, 'planifie', 13),
+(11, 'match', '2026-05-12 15:00:00', '2026-05-12 17:00:00', 'Gymnase Mermoz', '12 Rue Mermoz, Bordeaux', 'Match de classement', 600, 'planifie', 14),
+(12, 'tournoi', '2026-06-01 09:00:00', '2026-06-01 20:00:00', 'Arena Nice', '4 Avenue Mediterranee, Nice', 'Finales regionales jeunes', 1500, 'planifie', 16),
+(13, 'match', '2026-06-10 14:00:00', '2026-06-10 16:00:00', 'Stade Municipal', '3 Rue de la Paix, Lille', 'Rencontre amicale annulee', 500, 'annule', 18),
+(14, 'entrainement', '2026-04-15 18:00:00', '2026-04-15 20:00:00', 'Gymnase du Port', '2 Quai des Sportifs, Nice', 'Mise en place tactique avant tournoi', 70, 'planifie', 23);
+
+INSERT INTO `participation` (`num_equipe`, `num_evenement`, `score`, `resultat`, `date_inscription`) VALUES
+(4, 5, NULL, NULL, '2026-03-08 10:00:00'),
+(4, 6, NULL, NULL, '2026-03-08 10:10:00'),
+(6, 6, NULL, NULL, '2026-03-08 10:15:00'),
+(4, 7, NULL, NULL, '2026-03-08 10:20:00'),
+(6, 7, NULL, NULL, '2026-03-08 10:25:00'),
+(8, 7, NULL, NULL, '2026-03-08 10:30:00'),
+(10, 7, NULL, NULL, '2026-03-08 10:35:00'),
+(12, 7, NULL, NULL, '2026-03-08 10:40:00'),
+(8, 8, '3-1', 'victoire', '2026-03-08 10:45:00'),
+(10, 8, '1-3', 'defaite', '2026-03-08 10:50:00'),
+(6, 10, NULL, NULL, '2026-03-08 11:05:00'),
+(12, 11, NULL, NULL, '2026-03-08 11:15:00'),
+(6, 13, NULL, NULL, '2026-03-08 11:50:00'),
+(10, 13, NULL, NULL, '2026-03-08 11:55:00');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

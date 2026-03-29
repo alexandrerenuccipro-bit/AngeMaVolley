@@ -21,10 +21,11 @@ function renderHomePage({
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(title)}</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme-toggle.js" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">${escapeHtml(title)}</h1>
+    <a class="logo" href="/">${escapeHtml(title)}</a>
     ${renderHotbar(user)}
   </header>
 
@@ -35,7 +36,7 @@ function renderHomePage({
       <p>${escapeHtml(message)}</p>
       <div class="hero-actions">
         ${user ? `<a href="/dashboard" class="cta">Accéder au Dashboard</a>` : `<a href="/connexion" class="cta">Connexion</a>`}
-        <a href="#" class="cta cta-outline">Voir le calendrier</a>
+        <a href="/calendrier" class="cta cta-outline">Voir le calendrier</a>
       </div>
     </section>
 

@@ -19,10 +19,11 @@ function renderLoginPage({ error, email }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion - AngeMa Volley</title>
   <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme-toggle.js" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <h1 class="logo">AngeMa Volley</h1>
+    <a class="logo" href="/">AngeMa Volley</a>
     <nav class="menu" aria-label="Navigation principale">
       <a href="/">Accueil</a>
     </nav>

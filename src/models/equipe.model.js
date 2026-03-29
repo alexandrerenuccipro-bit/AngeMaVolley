@@ -18,8 +18,9 @@ async function getAllEquipes() {
     LEFT JOIN club c ON e.num_club = c.num_club
     LEFT JOIN utilisateur u ON e.num_coach = u.num_user
     LEFT JOIN equipe_licencie el ON e.num_equipe = el.num_equipe
+    WHERE e.categorie = 'senior'
     GROUP BY e.num_equipe
-    ORDER BY e.categorie DESC, e.nom ASC
+    ORDER BY e.nom ASC
   `);
 
   return rows;
@@ -46,7 +47,7 @@ async function getEquipeById(numEquipe) {
     LEFT JOIN club c ON e.num_club = c.num_club
     LEFT JOIN utilisateur u ON e.num_coach = u.num_user
     LEFT JOIN equipe_licencie el ON e.num_equipe = el.num_equipe
-    WHERE e.num_equipe = ?
+    WHERE e.num_equipe = ? AND e.categorie = 'senior'
     GROUP BY e.num_equipe
   `, [numEquipe]);
 
