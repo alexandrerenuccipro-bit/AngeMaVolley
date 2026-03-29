@@ -23,11 +23,42 @@ function getCategoryColor(category) {
   return colors[category] || '#3b82f6';
 }
 
+function renderSearchBar(filters, resultCount) {
+  return `
+    <section class="equipe-search-panel" aria-label="Recherche d'equipe">
+      <form class="equipe-search-form" method="GET" action="/equipe">
+        <label for="equipe-search-input">Rechercher une equipe</label>
+        <input
+          id="equipe-search-input"
+          type="search"
+          name="search"
+          value="${escapeHtml(filters.search || '')}"
+          placeholder="Nom d'equipe, club ou ville"
+        >
+        <button type="submit" class="cta">Rechercher</button>
+        <a href="/equipe" class="cta cta-outline">Reinitialiser</a>
+      </form>
+      <p class="equipe-search-result">${resultCount} equipe(s) trouvee(s)</p>
+    </section>
+  `;
+}
+
 function renderListeEquipes(equipes) {
+  if (!equipes.length) {
+    return `
+      <section class="category-section">
+        <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
+          Equipes
+        </h3>
+        <p class="empty-state">Aucune equipe ne correspond a votre recherche.</p>
+      </section>
+    `;
+  }
+
   let html = `
     <section class="category-section">
       <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
-        Équipes
+        Equipes
       </h3>
       <div class="equipes-grid">
   `;
@@ -93,7 +124,7 @@ function renderListeEquipes(equipes) {
   return html;
 }
 
-function renderEquipePage(equipes, user) {
+function renderEquipePage(equipes, user, filters = { search: '' }) {
   const equipesHtml = renderListeEquipes(equipes);
 
   return `<!DOCTYPE html>
@@ -117,6 +148,8 @@ function renderEquipePage(equipes, user) {
       <h2>Les Équipes</h2>
       <p>Découvrez toutes nos équipes. Cliquez sur une équipe pour voir ses détails et ses joueurs.</p>
     </section>
+
+    ${renderSearchBar(filters, equipes.length)}
 
     ${equipesHtml}
   </main>

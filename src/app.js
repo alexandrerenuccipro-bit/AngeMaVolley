@@ -7,6 +7,7 @@ const homeRoutes = require('./routes/home.routes');
 const authRoutes = require('./routes/auth.routes');
 const equipeRoutes = require('./routes/equipe.routes');
 const calendrierRoutes = require('./routes/calendrier.routes');
+const evenementRoutes = require('./routes/evenement.routes');
 
 const app = express();
 
@@ -32,5 +33,6 @@ app.use('/', homeRoutes);
 app.use('/', authRoutes);
 app.use('/equipe', equipeRoutes);
 app.use('/calendrier', calendrierRoutes);
+app.use('/evenements', evenementRoutes);
 
 module.exports = app;

@@ -565,6 +565,55 @@ body {
   letter-spacing: 0.5px;
 }
 
+.equipe-search-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0 0 1.5rem;
+  box-shadow: var(--surface-shadow);
+}
+
+.equipe-search-form {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.equipe-search-form label {
+  grid-column: 1 / -1;
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 0.9rem;
+}
+
+.equipe-search-form input {
+  background: var(--input-bg);
+  color: var(--dark-text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+}
+
+.equipe-search-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.equipe-search-form .cta {
+  width: auto;
+  min-height: 44px;
+}
+
+.equipe-search-result {
+  margin: 0.8rem 0 0;
+  color: var(--secondary-text);
+  font-weight: 600;
+}
+
 .equipes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1193,6 +1242,112 @@ body {
 }
 
 /* ============================================
+   CREATION EVENEMENT
+   ============================================ */
+.event-form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--surface-shadow);
+}
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.event-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 0.92rem;
+}
+
+.event-form input,
+.event-form select,
+.event-form textarea {
+  background: var(--input-bg);
+  color: var(--dark-text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.event-form textarea {
+  resize: vertical;
+}
+
+.event-form input:focus,
+.event-form select:focus,
+.event-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.event-team-fieldset {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+}
+
+.event-team-fieldset legend {
+  font-weight: 700;
+  color: var(--dark-text);
+  font-size: 0.92rem;
+  padding: 0 0.4rem;
+}
+
+.event-team-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.event-team-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--card-bg) 95%, #000 5%);
+}
+
+.event-team-item input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.event-form-help {
+  margin: 0;
+  color: var(--muted-text);
+}
+
+.event-success {
+  margin: 0 0 1rem;
+  border: 1px solid #15803d;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  background: #14532d;
+  color: #dcfce7;
+  font-weight: 600;
+}
+
+/* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 @media (max-width: 768px) {
@@ -1246,6 +1401,14 @@ body {
 
   .equipes-grid {
     grid-template-columns: 1fr;
+  }
+
+  .equipe-search-form {
+    grid-template-columns: 1fr;
+  }
+
+  .equipe-search-form .cta {
+    width: 100%;
   }
 
   .equipe-header {
@@ -1306,6 +1469,14 @@ body {
   }
 
   .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-team-list {
     grid-template-columns: 1fr;
   }
 }

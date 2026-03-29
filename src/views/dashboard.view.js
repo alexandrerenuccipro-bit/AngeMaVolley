@@ -16,7 +16,7 @@ function getRoleLabel(user) {
 
   const labels = {
     coach: 'Coach',
-    licencie: 'Joueur / Licencié',
+    licencie: 'Joueur/Licencié',
     responsable_club: 'Responsable de club'
   };
 
@@ -49,7 +49,24 @@ function getRoleCards(user) {
   return cardsByRole[user.role] || [{ title: 'Tableau de bord', text: 'Bienvenue sur ton espace.' }];
 }
 
-function renderDashboardPage({ user }) {
+function renderTeamLine(user, teams) {
+  const shouldShowTeams = user.role === 'coach' || user.role === 'licencie';
+
+  if (!shouldShowTeams) {
+    return '';
+  }
+
+  if (!teams.length) {
+    return '<p>Équipe: <strong>Non attribuée</strong></p>';
+  }
+
+  const label = teams.length > 1 ? 'Équipes' : 'Équipe';
+  const teamNames = teams.map((teamName) => escapeHtml(teamName)).join(', ');
+
+  return `<p>${label}: <strong>${teamNames}</strong></p>`;
+}
+
+function renderDashboardPage({ user, teams = [] }) {
   const cardsMarkup = getRoleCards(user)
     .map(
       (card) => `
@@ -81,6 +98,7 @@ function renderDashboardPage({ user }) {
       <p class="tag">Espace personnel</p>
       <h2>Bienvenue ${escapeHtml(user.prenom)} ${escapeHtml(user.nom)}</h2>
       <p>Rôle: <strong>${escapeHtml(getRoleLabel(user))}</strong></p>
+      ${renderTeamLine(user, teams)}
       <form method="POST" action="/deconnexion">
         <button type="submit" class="cta cta-outline">Se déconnecter</button>
       </form>

@@ -14,6 +14,44 @@ async function findActiveUserByEmail(email) {
   return rows[0] || null;
 }
 
+async function findUserTeamNamesForDashboard(user) {
+  if (!user || user.estAdmin) {
+    return [];
+  }
+
+  if (user.role === 'coach') {
+    const [rows] = await pool.query(
+      `
+      SELECT DISTINCT e.nom
+      FROM equipe e
+      WHERE e.num_coach = ?
+      ORDER BY e.nom ASC
+      `,
+      [user.id]
+    );
+
+    return rows.map((row) => row.nom);
+  }
+
+  if (user.role === 'licencie') {
+    const [rows] = await pool.query(
+      `
+      SELECT DISTINCT e.nom
+      FROM equipe_licencie el
+      JOIN equipe e ON e.num_equipe = el.num_equipe
+      WHERE el.num_user = ?
+      ORDER BY e.nom ASC
+      `,
+      [user.id]
+    );
+
+    return rows.map((row) => row.nom);
+  }
+
+  return [];
+}
+
 module.exports = {
-  findActiveUserByEmail
+  findActiveUserByEmail,
+  findUserTeamNamesForDashboard
 };

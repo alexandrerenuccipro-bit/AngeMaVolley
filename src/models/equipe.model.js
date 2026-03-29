@@ -1,7 +1,24 @@
 const pool = require('./db');
 
-async function getAllEquipes() {
-  const [rows] = await pool.query(`
+async function getAllEquipes(search = '') {
+  const normalizedSearch = String(search || '').trim();
+  const params = [];
+  let searchClause = '';
+
+  if (normalizedSearch) {
+    searchClause = `
+      AND (
+        e.nom LIKE ?
+        OR c.nom LIKE ?
+        OR c.ville LIKE ?
+      )
+    `;
+    const likeValue = `%${normalizedSearch}%`;
+    params.push(likeValue, likeValue, likeValue);
+  }
+
+  const [rows] = await pool.query(
+    `
     SELECT 
       e.num_equipe,
       e.nom,
@@ -19,9 +36,12 @@ async function getAllEquipes() {
     LEFT JOIN utilisateur u ON e.num_coach = u.num_user
     LEFT JOIN equipe_licencie el ON e.num_equipe = el.num_equipe
     WHERE e.categorie = 'senior'
+    ${searchClause}
     GROUP BY e.num_equipe
     ORDER BY e.nom ASC
-  `);
+  `,
+    params
+  );
 
   return rows;
 }

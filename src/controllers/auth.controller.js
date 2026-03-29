@@ -1,5 +1,8 @@
 const crypto = require('node:crypto');
-const { findActiveUserByEmail } = require('../models/auth.model');
+const {
+  findActiveUserByEmail,
+  findUserTeamNamesForDashboard
+} = require('../models/auth.model');
 const { renderLoginPage } = require('../views/auth.view');
 const { renderDashboardPage } = require('../views/dashboard.view');
 
@@ -59,9 +62,15 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.dashboard = (req, res) => {
-  const html = renderDashboardPage({ user: req.session.user });
-  res.status(200).send(html);
+exports.dashboard = async (req, res) => {
+  try {
+    const teams = await findUserTeamNamesForDashboard(req.session.user);
+    const html = renderDashboardPage({ user: req.session.user, teams });
+    return res.status(200).send(html);
+  } catch (error) {
+    console.error('Erreur chargement dashboard:', error.message);
+    return res.status(500).send('<h1>Erreur serveur</h1><p>Impossible de charger le dashboard.</p>');
+  }
 };
 
 exports.logout = (req, res) => {
