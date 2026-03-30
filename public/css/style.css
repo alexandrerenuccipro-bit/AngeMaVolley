@@ -1334,3 +1334,135 @@ body {
     grid-template-columns: repeat(2, minmax(140px, 1fr));
   }
 }
+
+/* ============================================
+   ADMIN INTERFACE
+   ============================================ */
+.admin-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.admin-nav a {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  color: var(--dark-text);
+  transition: var(--transition);
+}
+
+.admin-nav a:hover,
+.admin-nav a.active {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border-color: var(--primary);
+}
+
+/* Grille de statistiques */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--surface-shadow);
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+}
+
+.stat-card .stat-label {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+  margin-top: 0.3rem;
+  display: block;
+}
+
+.stat-card.warning .stat-value { color: #d97706; }
+.stat-card.danger  .stat-value { color: #dc2626; }
+.stat-card.success .stat-value { color: #16a34a; }
+
+/* Boutons d'action dans les tableaux */
+.action-btn {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-success           { background: #16a34a; color: #fff; }
+.btn-success:hover     { background: #15803d; }
+.btn-danger            { background: #dc2626; color: #fff; }
+.btn-danger:hover      { background: #b91c1c; }
+.btn-info              { background: #0ea5e9; color: #fff; }
+.btn-info:hover        { background: #0284c7; }
+
+/* Alerte succès */
+.alert-success {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+/* Barre de filtre / recherche */
+.filter-bar {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.filter-bar input {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--dark-text);
+  font-size: 0.9rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-bar input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* Responsive admin */
+@media (max-width: 768px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-nav a {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.9rem;
+  }
+}
