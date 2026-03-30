@@ -1,11 +1,12 @@
 const express = require('express');
-const path = require('path');
+const path = require('node:path');
 const morgan = require('morgan');
 const session = require('express-session');
 
 const homeRoutes = require('./routes/home.routes');
 const authRoutes = require('./routes/auth.routes');
 const equipeRoutes = require('./routes/equipe.routes');
+const calendrierRoutes = require('./routes/calendrier.routes');
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use(
 app.use('/', homeRoutes);
 app.use('/', authRoutes);
 app.use('/equipe', equipeRoutes);
+app.use('/calendrier', calendrierRoutes);
 
 module.exports = app;
