@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS `club` (
   `ville` varchar(100) DEFAULT NULL,
   `code_postal` varchar(10) DEFAULT NULL,
   `date_creation` date DEFAULT NULL,
-  `site_web` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`num_club`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -46,10 +45,10 @@ CREATE TABLE IF NOT EXISTS `club` (
 -- Dumping data for table `club`
 --
 
-INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adresse`, `ville`, `code_postal`, `date_creation`, `site_web`) VALUES
-(1, 'AS Marseille Nord', 'Bouches-du-Rhône', '0491010101', 'contact@asmn.fr', '12 Rue des Sports', 'Marseille', '13001', '1995-09-01', NULL),
-(2, 'FC Lyon Est', 'Rhône', '0472020202', 'contact@fcle.fr', '5 Avenue du Stade', 'Lyon', '69001', '2002-03-15', NULL),
-(3, 'Sporting Paris Sud', 'Paris', '0143030303', 'contact@sps.fr', '88 Boulevard du Foot', 'Paris', '75013', '1988-06-20', NULL);
+INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adresse`, `ville`, `code_postal`, `date_creation`) VALUES
+(1, 'AS Marseille Nord', 'Bouches-du-Rhône', '0491010101', 'contact@asmn.fr', '12 Rue des Sports', 'Marseille', '13001', '1995-09-01'),
+(2, 'FC Lyon Est', 'Rhône', '0472020202', 'contact@fcle.fr', '5 Avenue du Stade', 'Lyon', '69001', '2002-03-15'),
+(3, 'Sporting Paris Sud', 'Paris', '0143030303', 'contact@sps.fr', '88 Boulevard du Foot', 'Paris', '75013', '1988-06-20');
 
 -- --------------------------------------------------------
 
@@ -60,9 +59,7 @@ INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adr
 DROP TABLE IF EXISTS `coach`;
 CREATE TABLE IF NOT EXISTS `coach` (
   `num_user` int NOT NULL,
-  `specialite` varchar(100) DEFAULT NULL,
   `diplome` varchar(100) DEFAULT NULL,
-  `annees_experience` int DEFAULT '0',
   PRIMARY KEY (`num_user`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -70,9 +67,46 @@ CREATE TABLE IF NOT EXISTS `coach` (
 -- Dumping data for table `coach`
 --
 
-INSERT INTO `coach` (`num_user`, `specialite`, `diplome`, `annees_experience`) VALUES
-(3, 'Attaque', 'UEFA B', 8),
-(8, 'Défense', 'UEFA A', 12);
+INSERT INTO `coach` (`num_user`, `diplome`) VALUES
+(3, 'UEFA B'),
+(8, 'UEFA A');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `demande_licence_coach`
+--
+
+DROP TABLE IF EXISTS `demande_licence_coach`;
+CREATE TABLE IF NOT EXISTS `demande_licence_coach` (
+  `num_demande` int NOT NULL AUTO_INCREMENT,
+  `num_user` int NOT NULL,
+  `statut` enum('en_attente','validee','refusee') NOT NULL DEFAULT 'en_attente',
+  `date_demande` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_traitement` datetime DEFAULT NULL,
+  `diplome` varchar(100) NOT NULL,
+  PRIMARY KEY (`num_demande`),
+  KEY `num_user` (`num_user`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `demande_licence_joueur`
+--
+
+DROP TABLE IF EXISTS `demande_licence_joueur`;
+CREATE TABLE IF NOT EXISTS `demande_licence_joueur` (
+  `num_demande` int NOT NULL AUTO_INCREMENT,
+  `num_user` int NOT NULL,
+  `statut` enum('en_attente','validee','refusee') NOT NULL DEFAULT 'en_attente',
+  `date_demande` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_traitement` datetime DEFAULT NULL,
+  `poids` decimal(5,2) DEFAULT NULL,
+  `taille` int DEFAULT NULL,
+  PRIMARY KEY (`num_demande`),
+  KEY `num_user` (`num_user`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -114,7 +148,6 @@ CREATE TABLE IF NOT EXISTS `equipe_licencie` (
   `num_user` int NOT NULL,
   `date_integration` date DEFAULT NULL,
   `numero_maillot` int DEFAULT NULL,
-  `capitaine` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`num_equipe`,`num_user`),
   KEY `num_user` (`num_user`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -123,9 +156,9 @@ CREATE TABLE IF NOT EXISTS `equipe_licencie` (
 -- Dumping data for table `equipe_licencie`
 --
 
-INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`, `capitaine`) VALUES
-(1, 4, '2022-09-01', 9, 1),
-(1, 5, '2023-01-15', 10, 0);
+INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`) VALUES
+(1, 4, '2022-09-01', 9),
+(1, 5, '2023-01-15', 10);
 
 -- --------------------------------------------------------
 
@@ -169,13 +202,11 @@ DROP TABLE IF EXISTS `licence`;
 CREATE TABLE IF NOT EXISTS `licence` (
   `num_licence` int NOT NULL AUTO_INCREMENT,
   `num_user` int NOT NULL,
-  `type` enum('amateur','professionnel','jeune') NOT NULL,
   `date_debut` date NOT NULL,
   `date_fin` date NOT NULL,
   `validee` tinyint(1) DEFAULT '0',
   `num_validateur` int DEFAULT NULL,
   `date_validation` datetime DEFAULT NULL,
-  `montant_cotisation` decimal(8,2) DEFAULT NULL,
   PRIMARY KEY (`num_licence`),
   KEY `num_user` (`num_user`),
   KEY `num_validateur` (`num_validateur`)
@@ -185,13 +216,13 @@ CREATE TABLE IF NOT EXISTS `licence` (
 -- Dumping data for table `licence`
 --
 
-INSERT INTO `licence` (`num_licence`, `num_user`, `type`, `date_debut`, `date_fin`, `validee`, `num_validateur`, `date_validation`, `montant_cotisation`) VALUES
-(1, 4, 'amateur', '2024-09-01', '2025-08-31', 1, 1, '2024-09-03 10:00:00', 150.00),
-(2, 5, 'amateur', '2024-09-01', '2025-08-31', 1, 1, '2024-09-03 10:30:00', 150.00),
-(3, 6, 'professionnel', '2024-09-01', '2025-08-31', 1, 1, '2024-09-04 09:00:00', 300.00),
-(4, 7, 'amateur', '2024-09-01', '2025-08-31', 0, NULL, NULL, 150.00),
-(5, 10, 'jeune', '2024-09-01', '2025-08-31', 1, 1, '2024-09-05 11:00:00', 80.00),
-(6, 4, 'amateur', '2023-09-01', '2024-08-31', 1, 1, '2023-09-02 14:00:00', 140.00);
+INSERT INTO `licence` (`num_licence`, `num_user`, `date_debut`, `date_fin`, `validee`, `num_validateur`, `date_validation`) VALUES
+(1, 4, '2024-09-01', '2025-08-31', 1, 1, '2024-09-03 10:00:00'),
+(2, 5, '2024-09-01', '2025-08-31', 1, 1, '2024-09-03 10:30:00'),
+(3, 6, '2024-09-01', '2025-08-31', 1, 1, '2024-09-04 09:00:00'),
+(4, 7, '2024-09-01', '2025-08-31', 0, NULL, NULL),
+(5, 10, '2024-09-01', '2025-08-31', 1, 1, '2024-09-05 11:00:00'),
+(6, 4, '2023-09-01', '2024-08-31', 1, 1, '2023-09-02 14:00:00');
 
 -- --------------------------------------------------------
 
@@ -204,10 +235,8 @@ CREATE TABLE IF NOT EXISTS `licencie` (
   `num_user` int NOT NULL,
   `statut` enum('actif','inactif','suspendu') NOT NULL DEFAULT 'actif',
   `num_club` int NOT NULL,
-  `position` varchar(50) DEFAULT NULL,
   `poids_kg` decimal(5,2) DEFAULT NULL,
   `taille_cm` int DEFAULT NULL,
-  `numero_securite_sociale` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`num_user`),
   KEY `num_club` (`num_club`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -216,12 +245,12 @@ CREATE TABLE IF NOT EXISTS `licencie` (
 -- Dumping data for table `licencie`
 --
 
-INSERT INTO `licencie` (`num_user`, `statut`, `num_club`, `position`, `poids_kg`, `taille_cm`, `numero_securite_sociale`) VALUES
-(4, 'actif', 1, 'Attaquant', 72.50, 178, NULL),
-(5, 'actif', 1, 'Milieu', 68.00, 175, NULL),
-(6, 'actif', 2, 'Défenseur', 75.00, 182, NULL),
-(7, 'suspendu', 2, 'Gardien', 80.00, 185, NULL),
-(10, 'actif', 3, 'Attaquant', 65.50, 170, NULL);
+INSERT INTO `licencie` (`num_user`, `statut`, `num_club`, `poids_kg`, `taille_cm`) VALUES
+(4, 'actif', 1, 72.50, 178),
+(5, 'actif', 1, 68.00, 175),
+(6, 'actif', 2, 75.00, 182),
+(7, 'suspendu', 2, 80.00, 185),
+(10, 'actif', 3, 65.50, 170);
 
 -- --------------------------------------------------------
 
@@ -251,27 +280,6 @@ INSERT INTO `participation` (`num_equipe`, `num_evenement`, `score`, `resultat`,
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `responsableclub`
---
-
-DROP TABLE IF EXISTS `responsableclub`;
-CREATE TABLE IF NOT EXISTS `responsableclub` (
-  `num_user` int NOT NULL,
-  `num_club` int NOT NULL,
-  `date_prise_poste` date DEFAULT NULL,
-  PRIMARY KEY (`num_user`),
-  KEY `num_club` (`num_club`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `responsableclub`
---
-
-INSERT INTO `responsableclub` (`num_user`, `num_club`, `date_prise_poste`) VALUES
-(2, 1, '2020-01-10'),
-(9, 2, '2019-05-01');
-
 -- --------------------------------------------------------
 
 --
@@ -288,7 +296,7 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
   `telephone` varchar(20) DEFAULT NULL,
   `date_naissance` date DEFAULT NULL,
   `date_inscription` datetime DEFAULT CURRENT_TIMESTAMP,
-  `role` enum('responsable_club','coach','licencie') NOT NULL,
+  `role` enum('admin','coach','licencie','utilisateur') NOT NULL,
   `est_admin` tinyint(1) DEFAULT '0',
   `actif` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`num_user`),
@@ -300,35 +308,35 @@ CREATE TABLE IF NOT EXISTS `utilisateur` (
 --
 
 INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `date_naissance`, `date_inscription`, `role`, `est_admin`, `actif`) VALUES
-(1, 'Renucci', 'Alexandre', 'alexandre.renucci.pro@gmail.com', 'Alexandre', '0674103121', '2005-11-29', '2026-03-04 00:38:24', 'responsable_club', 1, 1),
-(2, 'Dupont', 'Pierre', 'pierre.dupont@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0602030405', '1978-07-22', '2026-03-04 00:38:24', 'responsable_club', 0, 1),
+(1, 'Renucci', 'Alexandre', 'alexandre.renucci.pro@gmail.com', 'Alexandre', '0674103121', '2005-11-29', '2026-03-04 00:38:24', 'admin', 1, 1),
+(2, 'Dupont', 'Pierre', 'pierre.dupont@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0602030405', '1978-07-22', '2026-03-04 00:38:24', 'admin', 0, 1),
 (3, 'Bernard', 'Lucas', 'lucas.bernard@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0603040506', '1990-11-05', '2026-03-04 00:38:24', 'coach', 0, 1),
 (4, 'Leroy', 'Emma', 'emma.leroy@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0604050607', '1999-01-18', '2026-03-04 00:38:24', 'licencie', 0, 1),
 (5, 'Moreau', 'Hugo', 'hugo.moreau@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0605060708', '2001-06-30', '2026-03-04 00:38:24', 'licencie', 0, 1),
 (6, 'Petit', 'Chloé', 'chloe.petit@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0606070809', '2000-09-14', '2026-03-04 00:38:24', 'licencie', 0, 1),
 (7, 'Simon', 'Théo', 'theo.simon@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0607080910', '1998-04-02', '2026-03-04 00:38:24', 'licencie', 0, 1),
 (8, 'Laurent', 'Julie', 'julie.laurent@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0608091011', '1995-12-25', '2026-03-04 00:38:24', 'coach', 0, 1),
-(9, 'Michel', 'Antoine', 'antoine.michel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0609101112', '1980-08-17', '2026-03-04 00:38:24', 'responsable_club', 0, 1),
+(9, 'Michel', 'Antoine', 'antoine.michel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0609101112', '1980-08-17', '2026-03-04 00:38:24', 'admin', 0, 1),
 (10, 'Garcia', 'Nina', 'nina.garcia@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0610111213', '2003-02-28', '2026-03-04 00:38:24', 'licencie', 0, 1);
 
 -- --------------------------------------------------------
 -- Jeu de donnees etendu (coherent et volumineux)
 -- --------------------------------------------------------
 
-INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adresse`, `ville`, `code_postal`, `date_creation`, `site_web`) VALUES
-(4, 'Volley Nantes Atlantique', 'Loire-Atlantique', '0240404040', 'contact@vna.fr', '22 Rue des Sports', 'Nantes', '44000', '2008-09-01', 'https://vna.fr'),
-(5, 'Toulouse Volley Union', 'Haute-Garonne', '0560505050', 'contact@tvu.fr', '14 Avenue des Arenes', 'Toulouse', '31000', '2011-02-12', 'https://tvu.fr'),
-(6, 'Lille Metropole Volley', 'Nord', '0320606060', 'contact@lmv.fr', '9 Boulevard Faidherbe', 'Lille', '59000', '2005-06-18', 'https://lmv.fr'),
-(7, 'Nice Cote Volley', 'Alpes-Maritimes', '0490707070', 'contact@ncv.fr', '30 Promenade des Sports', 'Nice', '06000', '2013-04-20', 'https://ncv.fr'),
-(8, 'Bordeaux Gironde Volley', 'Gironde', '0550808080', 'contact@bgv.fr', '6 Rue des Arenes', 'Bordeaux', '33000', '2009-01-09', 'https://bgv.fr');
+INSERT INTO `club` (`num_club`, `nom`, `departement`, `telephone`, `email`, `adresse`, `ville`, `code_postal`, `date_creation`) VALUES
+(4, 'Volley Nantes Atlantique', 'Loire-Atlantique', '0240404040', 'contact@vna.fr', '22 Rue des Sports', 'Nantes', '44000', '2008-09-01'),
+(5, 'Toulouse Volley Union', 'Haute-Garonne', '0560505050', 'contact@tvu.fr', '14 Avenue des Arenes', 'Toulouse', '31000', '2011-02-12'),
+(6, 'Lille Metropole Volley', 'Nord', '0320606060', 'contact@lmv.fr', '9 Boulevard Faidherbe', 'Lille', '59000', '2005-06-18'),
+(7, 'Nice Cote Volley', 'Alpes-Maritimes', '0490707070', 'contact@ncv.fr', '30 Promenade des Sports', 'Nice', '06000', '2013-04-20'),
+(8, 'Bordeaux Gironde Volley', 'Gironde', '0550808080', 'contact@bgv.fr', '6 Rue des Arenes', 'Bordeaux', '33000', '2009-01-09');
 
 INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`, `telephone`, `date_naissance`, `date_inscription`, `role`, `est_admin`, `actif`) VALUES
-(11, 'Vidal', 'Claire', 'claire.vidal@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0611111111', '1984-11-18', '2026-03-04 10:10:00', 'responsable_club', 1, 1),
-(12, 'Durand', 'Camille', 'camille.durand@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0612121212', '1982-05-10', '2026-03-04 10:11:00', 'responsable_club', 0, 1),
-(13, 'Renaud', 'Julien', 'julien.renaud@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0613131313', '1986-09-22', '2026-03-04 10:12:00', 'responsable_club', 0, 1),
-(14, 'Morel', 'Amandine', 'amandine.morel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0614141414', '1981-12-01', '2026-03-04 10:13:00', 'responsable_club', 0, 1),
-(15, 'Lacroix', 'Thomas', 'thomas.lacroix@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0615151515', '1979-07-07', '2026-03-04 10:14:00', 'responsable_club', 0, 1),
-(16, 'Perrot', 'Nadine', 'nadine.perrot@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0616161616', '1983-02-23', '2026-03-04 10:15:00', 'responsable_club', 0, 1),
+(11, 'Vidal', 'Claire', 'claire.vidal@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0611111111', '1984-11-18', '2026-03-04 10:10:00', 'admin', 1, 1),
+(12, 'Durand', 'Camille', 'camille.durand@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0612121212', '1982-05-10', '2026-03-04 10:11:00', 'admin', 0, 1),
+(13, 'Renaud', 'Julien', 'julien.renaud@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0613131313', '1986-09-22', '2026-03-04 10:12:00', 'admin', 0, 1),
+(14, 'Morel', 'Amandine', 'amandine.morel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0614141414', '1981-12-01', '2026-03-04 10:13:00', 'admin', 0, 1),
+(15, 'Lacroix', 'Thomas', 'thomas.lacroix@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0615151515', '1979-07-07', '2026-03-04 10:14:00', 'admin', 0, 1),
+(16, 'Perrot', 'Nadine', 'nadine.perrot@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0616161616', '1983-02-23', '2026-03-04 10:15:00', 'admin', 0, 1),
 (17, 'Noel', 'Aline', 'aline.noel@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0617171717', '1989-03-14', '2026-03-04 10:16:00', 'coach', 0, 1),
 (18, 'Perrin', 'David', 'david.perrin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0618181818', '1991-12-03', '2026-03-04 10:17:00', 'coach', 0, 1),
 (19, 'Meyer', 'Laura', 'laura.meyer@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0619191919', '1993-07-28', '2026-03-04 10:18:00', 'coach', 0, 1),
@@ -359,22 +367,15 @@ INSERT INTO `utilisateur` (`num_user`, `nom`, `prenom`, `email`, `mot_de_passe`,
 (44, 'Morin', 'Sacha', 'sacha.morin@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0644444444', '2004-03-09', '2026-03-04 10:43:00', 'licencie', 0, 1),
 (45, 'Julien', 'Agathe', 'agathe.julien@email.fr', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', '0645454545', '2005-01-05', '2026-03-04 10:44:00', 'licencie', 0, 1);
 
-INSERT INTO `responsableclub` (`num_user`, `num_club`, `date_prise_poste`) VALUES
-(12, 4, '2021-09-01'),
-(13, 5, '2022-01-10'),
-(14, 6, '2020-06-15'),
-(15, 7, '2019-11-08'),
-(16, 8, '2023-02-01');
-
-INSERT INTO `coach` (`num_user`, `specialite`, `diplome`, `annees_experience`) VALUES
-(17, 'Reception-defense', 'DEJEPS Volley', 9),
-(18, 'Formation jeunes', 'BPJEPS APT', 6),
-(19, 'Bloc et contre-attaque', 'DEJEPS Volley', 11),
-(20, 'Condition physique', 'Licence STAPS', 7),
-(21, 'Service tactique', 'DEJEPS Volley', 8),
-(22, 'Analyse video', 'Master Preparation Mentale', 10),
-(23, 'Technique individuelle', 'BPJEPS APT', 5),
-(24, 'Coordination minimes', 'CQP ALS', 4);
+INSERT INTO `coach` (`num_user`, `diplome`) VALUES
+(17, 'DEJEPS Volley'),
+(18, 'BPJEPS APT'),
+(19, 'DEJEPS Volley'),
+(20, 'Licence STAPS'),
+(21, 'DEJEPS Volley'),
+(22, 'Master Preparation Mentale'),
+(23, 'BPJEPS APT'),
+(24, 'CQP ALS');
 
 INSERT INTO `equipe` (`num_equipe`, `nom`, `categorie`, `num_club`, `num_coach`, `date_creation`, `couleur_maillot`, `nb_joueurs_max`) VALUES
 (4, 'Volley Nantes A Seniors', 'senior', 4, 17, '2022-09-01', '#1e40af', 20),
@@ -383,65 +384,65 @@ INSERT INTO `equipe` (`num_equipe`, `nom`, `categorie`, `num_club`, `num_coach`,
 (10, 'Nice Azur Seniors', 'senior', 7, 23, '2020-09-01', '#ef4444', 20),
 (12, 'Bordeaux Gironde A', 'senior', 8, 18, '2021-09-01', '#b45309', 20);
 
-INSERT INTO `licencie` (`num_user`, `statut`, `num_club`, `position`, `poids_kg`, `taille_cm`, `numero_securite_sociale`) VALUES
-(25, 'actif', 4, 'Passeur', 73.00, 181, NULL),
-(26, 'actif', 4, 'Central', 82.00, 192, NULL),
-(27, 'actif', 4, 'Attaquant', 69.00, 176, NULL),
-(28, 'actif', 4, 'Libero', 64.00, 171, NULL),
-(29, 'actif', 4, 'Passeur', 66.00, 174, NULL),
-(30, 'actif', 5, 'Attaquant', 71.00, 179, NULL),
-(31, 'actif', 5, 'Central', 74.00, 183, NULL),
-(32, 'inactif', 5, 'Libero', 61.00, 169, NULL),
-(33, 'actif', 5, 'Passeur', 68.00, 175, NULL),
-(34, 'actif', 5, 'Attaquant', 70.00, 178, NULL),
-(35, 'actif', 6, 'Central', 84.00, 194, NULL),
-(36, 'actif', 6, 'Attaquant', 72.00, 180, NULL),
-(37, 'suspendu', 6, 'Passeur', 70.00, 177, NULL),
-(38, 'actif', 6, 'Libero', 63.00, 168, NULL),
-(39, 'actif', 7, 'Attaquant', 67.00, 174, NULL),
-(40, 'actif', 7, 'Central', 76.00, 186, NULL),
-(41, 'actif', 7, 'Libero', 59.00, 165, NULL),
-(42, 'actif', 8, 'Passeur', 71.00, 179, NULL),
-(43, 'actif', 8, 'Attaquant', 74.00, 184, NULL),
-(44, 'actif', 8, 'Central', 78.00, 188, NULL),
-(45, 'actif', 8, 'Libero', 62.00, 167, NULL);
+INSERT INTO `licencie` (`num_user`, `statut`, `num_club`, `poids_kg`, `taille_cm`) VALUES
+(25, 'actif', 4, 73.00, 181),
+(26, 'actif', 4, 82.00, 192),
+(27, 'actif', 4, 69.00, 176),
+(28, 'actif', 4, 64.00, 171),
+(29, 'actif', 4, 66.00, 174),
+(30, 'actif', 5, 71.00, 179),
+(31, 'actif', 5, 74.00, 183),
+(32, 'inactif', 5, 61.00, 169),
+(33, 'actif', 5, 68.00, 175),
+(34, 'actif', 5, 70.00, 178),
+(35, 'actif', 6, 84.00, 194),
+(36, 'actif', 6, 72.00, 180),
+(37, 'suspendu', 6, 70.00, 177),
+(38, 'actif', 6, 63.00, 168),
+(39, 'actif', 7, 67.00, 174),
+(40, 'actif', 7, 76.00, 186),
+(41, 'actif', 7, 59.00, 165),
+(42, 'actif', 8, 71.00, 179),
+(43, 'actif', 8, 74.00, 184),
+(44, 'actif', 8, 78.00, 188),
+(45, 'actif', 8, 62.00, 167);
 
-INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`, `capitaine`) VALUES
-(4, 25, '2025-09-01', 2, 0),
-(4, 26, '2025-09-01', 5, 1),
-(4, 27, '2025-09-01', 9, 0),
-(6, 30, '2025-09-01', 8, 1),
-(6, 31, '2025-09-01', 6, 0),
-(6, 32, '2025-09-01', 12, 0),
-(8, 35, '2025-09-01', 14, 1),
-(8, 36, '2025-09-01', 15, 0),
-(10, 39, '2025-09-01', 16, 1),
-(10, 40, '2025-09-01', 18, 0),
-(12, 42, '2025-09-01', 17, 1),
-(12, 43, '2025-09-01', 19, 0);
+INSERT INTO `equipe_licencie` (`num_equipe`, `num_user`, `date_integration`, `numero_maillot`) VALUES
+(4, 25, '2025-09-01', 2),
+(4, 26, '2025-09-01', 5),
+(4, 27, '2025-09-01', 9),
+(6, 30, '2025-09-01', 8),
+(6, 31, '2025-09-01', 6),
+(6, 32, '2025-09-01', 12),
+(8, 35, '2025-09-01', 14),
+(8, 36, '2025-09-01', 15),
+(10, 39, '2025-09-01', 16),
+(10, 40, '2025-09-01', 18),
+(12, 42, '2025-09-01', 17),
+(12, 43, '2025-09-01', 19);
 
-INSERT INTO `licence` (`num_licence`, `num_user`, `type`, `date_debut`, `date_fin`, `validee`, `num_validateur`, `date_validation`, `montant_cotisation`) VALUES
-(7, 25, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:00:00', 170.00),
-(8, 26, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:10:00', 170.00),
-(9, 27, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:20:00', 170.00),
-(10, 28, 'amateur', '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:30:00', 165.00),
-(11, 29, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:00:00', 95.00),
-(12, 30, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:10:00', 170.00),
-(13, 31, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:20:00', 170.00),
-(14, 32, 'jeune', '2025-09-01', '2026-08-31', 0, NULL, NULL, 95.00),
-(15, 33, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:30:00', 95.00),
-(16, 34, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:40:00', 95.00),
-(17, 35, 'professionnel', '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:00:00', 340.00),
-(18, 36, 'professionnel', '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:10:00', 340.00),
-(19, 37, 'professionnel', '2025-09-01', '2026-08-31', 0, NULL, NULL, 340.00),
-(20, 38, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:20:00', 160.00),
-(21, 39, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:30:00', 165.00),
-(22, 40, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:40:00', 165.00),
-(23, 41, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:50:00', 90.00),
-(24, 42, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:00:00', 170.00),
-(25, 43, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:10:00', 170.00),
-(26, 44, 'amateur', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:20:00', 175.00),
-(27, 45, 'jeune', '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:30:00', 90.00);
+INSERT INTO `licence` (`num_licence`, `num_user`, `date_debut`, `date_fin`, `validee`, `num_validateur`, `date_validation`) VALUES
+(7, 25, '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:00:00'),
+(8, 26, '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:10:00'),
+(9, 27, '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:20:00'),
+(10, 28, '2025-09-01', '2026-08-31', 1, 1, '2025-09-05 10:30:00'),
+(11, 29, '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:00:00'),
+(12, 30, '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:10:00'),
+(13, 31, '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:20:00'),
+(14, 32, '2025-09-01', '2026-08-31', 0, NULL, NULL),
+(15, 33, '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:30:00'),
+(16, 34, '2025-09-01', '2026-08-31', 1, 11, '2025-09-05 11:40:00'),
+(17, 35, '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:00:00'),
+(18, 36, '2025-09-01', '2026-08-31', 1, 1, '2025-09-06 14:10:00'),
+(19, 37, '2025-09-01', '2026-08-31', 0, NULL, NULL),
+(20, 38, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:20:00'),
+(21, 39, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:30:00'),
+(22, 40, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:40:00'),
+(23, 41, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 14:50:00'),
+(24, 42, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:00:00'),
+(25, 43, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:10:00'),
+(26, 44, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:20:00'),
+(27, 45, '2025-09-01', '2026-08-31', 1, 11, '2025-09-06 15:30:00');
 
 INSERT INTO `evenement` (`num_evenement`, `type`, `date_debut`, `date_fin`, `lieu`, `adresse_lieu`, `description`, `nb_places_max`, `statut`, `createur`) VALUES
 (5, 'entrainement', '2026-04-02 19:00:00', '2026-04-02 21:00:00', 'Gymnase Beaulieu', '10 Rue Beaulieu, Nantes', 'Seance technique service et reception', 60, 'planifie', 17),
