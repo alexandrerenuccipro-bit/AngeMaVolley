@@ -38,8 +38,8 @@
 [data-theme='dark'] {
   --primary: #60a5fa;
   --primary-hover: #3b82f6;
-  --accent: #34d399;
-  --accent-hover: #10b981;
+  --accent: #345ed3;
+  --accent-hover: #104bb9;
   --light-bg: #1f2937;
   --card-bg: #374151;
   --topbar-bg: #1f2937;
@@ -141,10 +141,6 @@ body {
   height: 2px;
   background: var(--primary);
   transition: var(--transition);
-}
-
-.menu a:hover {
-  color: var(--primary);
 }
 
 .menu a:hover::after {
@@ -300,6 +296,21 @@ body {
   color: var(--text-on-primary);
   border-color: var(--primary);
   box-shadow: 0 2px 8px var(--button-shadow);
+}
+
+.auth-card p a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.auth-form select {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--dark-text);
+  margin-bottom: 1rem;
 }
 
 /* ============================================
