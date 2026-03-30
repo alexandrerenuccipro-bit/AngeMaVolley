@@ -33,7 +33,6 @@
   --switch-track: #cfcfcf;
   --switch-track-active: #111111;
   --switch-knob: #ffffff;
-  --hot-bar-button: #707070;
 }
 
 [data-theme='dark'] {
@@ -142,10 +141,6 @@ body {
   height: 2px;
   background: var(--primary);
   transition: var(--transition);
-}
-
-.menu a:hover {
-  color: var(--hot-bar-button);
 }
 
 .menu a:hover::after {
