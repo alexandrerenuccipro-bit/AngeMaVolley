@@ -6,8 +6,14 @@ async function getAdminStats() {
     SELECT
       (SELECT COUNT(*) FROM utilisateur WHERE actif = 1)                    AS total_utilisateurs,
       (SELECT COUNT(*) FROM licencie WHERE statut = 'actif')                AS joueurs_actifs,
-      (SELECT COUNT(*) FROM licence WHERE validee = 0)                      AS licences_en_attente,
-      (SELECT COUNT(*) FROM licence WHERE validee = 1)                      AS licences_validees,
+      (
+        (SELECT COUNT(*) FROM demande_licence_joueur WHERE statut = 'en_attente') +
+        (SELECT COUNT(*) FROM demande_licence_coach WHERE statut = 'en_attente')
+      )                                                                      AS licences_en_attente,
+      (
+        (SELECT COUNT(*) FROM demande_licence_joueur WHERE statut = 'validee') +
+        (SELECT COUNT(*) FROM demande_licence_coach WHERE statut = 'validee')
+      )                                                                      AS licences_validees,
       (SELECT COUNT(*) FROM equipe)                                         AS total_equipes,
       (SELECT COUNT(*) FROM evenement WHERE statut = 'planifie')            AS events_a_venir,
       (SELECT COUNT(*) FROM coach)                                          AS total_coachs,
@@ -20,50 +26,67 @@ async function getAdminStats() {
 async function getAllLicences() {
   const [rows] = await pool.query(`
     SELECT
-      l.num_licence,
-      l.type,
-      l.date_debut,
-      l.date_fin,
-      l.validee,
-      l.date_validation,
-      l.montant_cotisation,
+      d.num_demande,
+      d.type_demande,
+      d.statut,
+      d.date_demande,
+      d.date_traitement,
       u.num_user,
       u.prenom,
       u.nom,
       u.email,
       c.nom AS nom_club,
-      c.ville,
-      v.prenom AS validateur_prenom,
-      v.nom    AS validateur_nom
-    FROM licence l
-    JOIN utilisateur u ON l.num_user = u.num_user
+      c.ville
+    FROM (
+      SELECT num_demande, num_user, 'licencie' AS type_demande, statut, date_demande, date_traitement
+      FROM demande_licence_joueur
+
+      UNION ALL
+
+      SELECT num_demande, num_user, 'coach' AS type_demande, statut, date_demande, date_traitement
+      FROM demande_licence_coach
+    ) d
+    INNER JOIN utilisateur u ON u.num_user = d.num_user
     LEFT JOIN licencie li ON li.num_user = u.num_user
-    LEFT JOIN club c ON li.num_club = c.num_club
-    LEFT JOIN utilisateur v ON l.num_validateur = v.num_user
-    ORDER BY l.validee ASC, l.date_debut DESC
+    LEFT JOIN club c ON c.num_club = li.num_club
+    ORDER BY CASE WHEN d.statut = 'en_attente' THEN 0 ELSE 1 END, d.date_demande DESC
   `);
   return rows;
 }
 
-async function validerLicence(numLicence, numValidateur) {
-  const [result] = await pool.query(`
-    UPDATE licence
-    SET validee = 1,
-        num_validateur = ?,
-        date_validation = NOW()
-    WHERE num_licence = ? AND validee = 0
-  `, [numValidateur, numLicence]);
+async function validerLicence(typeDemande, numDemande) {
+  const tableName = typeDemande === 'coach'
+    ? 'demande_licence_coach'
+    : 'demande_licence_joueur';
+
+  const [result] = await pool.query(
+    `
+      UPDATE ${tableName}
+      SET statut = 'validee',
+          date_traitement = NOW()
+      WHERE num_demande = ? AND statut = 'en_attente'
+    `,
+    [numDemande]
+  );
+
   return result.affectedRows > 0;
 }
 
-async function invaliderLicence(numLicence) {
-  const [result] = await pool.query(`
-    UPDATE licence
-    SET validee = 0,
-        num_validateur = NULL,
-        date_validation = NULL
-    WHERE num_licence = ?
-  `, [numLicence]);
+async function invaliderLicence(typeDemande, numDemande) {
+  const tableName = typeDemande === 'coach'
+    ? 'demande_licence_coach'
+    : 'demande_licence_joueur';
+
+  const [result] = await pool.query(
+    `
+      UPDATE ${tableName}
+      SET statut = 'refusee',
+          date_traitement = NOW()
+      WHERE num_demande = ?
+    `,
+    [numDemande]
+  );
+
   return result.affectedRows > 0;
 }
 
@@ -80,14 +103,13 @@ async function getAllJoueurs() {
       u.date_inscription,
       u.actif,
       li.statut,
-      li.position,
       li.poids_kg,
       li.taille_cm,
       c.nom  AS nom_club,
       c.ville,
       (
         SELECT COUNT(*)
-        FROM licence lc
+        FROM licence_joueur lc
         WHERE lc.num_user = u.num_user AND lc.validee = 1
       ) AS nb_licences_validees
     FROM utilisateur u
@@ -122,7 +144,7 @@ async function getAllCoachs() {
 }
 
 // ── ÉVÉNEMENTS ──────────────────────────────────────────────────
-async function getAllEvents() {
+async function getAllEvenements() {
   const [rows] = await pool.query(`
     SELECT
       e.num_evenement,
@@ -131,13 +153,10 @@ async function getAllEvents() {
       e.date_fin,
       e.lieu,
       e.description,
-      e.nb_places_max,
       e.statut,
-      u.prenom AS createur_prenom,
-      u.nom    AS createur_nom,
+      COUNT(DISTINCT p.num_equipe) AS nb_equipes,
       GROUP_CONCAT(DISTINCT eq.nom ORDER BY eq.nom SEPARATOR ', ') AS equipes
     FROM evenement e
-    LEFT JOIN utilisateur u ON e.createur = u.num_user
     LEFT JOIN participation p ON p.num_evenement = e.num_evenement
     LEFT JOIN equipe eq ON eq.num_equipe = p.num_equipe
     GROUP BY e.num_evenement
@@ -153,5 +172,5 @@ module.exports = {
   invaliderLicence,
   getAllJoueurs,
   getAllCoachs,
-  getAllEvents
+  getAllEvenements
 };

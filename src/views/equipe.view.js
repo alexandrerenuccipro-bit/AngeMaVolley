@@ -1,13 +1,5 @@
 const { renderHotbar } = require('./hotbar.view');
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
+const { escapeHtml } = require('./view.utils');
 
 function getCategoryLabel(category) {
   const labels = {
@@ -23,18 +15,49 @@ function getCategoryColor(category) {
   return colors[category] || '#3b82f6';
 }
 
+function renderSearchBar(filters, resultCount) {
+  return `
+    <section class="equipe-search-panel" aria-label="Recherche d'equipe">
+      <form class="equipe-search-form" method="GET" action="/equipe">
+        <label for="equipe-search-input">Rechercher une equipe</label>
+        <input
+          id="equipe-search-input"
+          type="search"
+          name="search"
+          value="${escapeHtml(filters.search || '')}"
+          placeholder="Nom d'equipe, club ou ville"
+        >
+        <button type="submit" class="cta">Rechercher</button>
+        <a href="/equipe" class="cta cta-outline">Reinitialiser</a>
+      </form>
+      <p class="equipe-search-result">${resultCount} equipe(s) trouvee(s)</p>
+    </section>
+  `;
+}
+
 function renderListeEquipes(equipes) {
+  if (!equipes.length) {
+    return `
+      <section class="category-section">
+        <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
+          Equipes
+        </h3>
+        <p class="empty-state">Aucune equipe ne correspond a votre recherche.</p>
+      </section>
+    `;
+  }
+
   let html = `
     <section class="category-section">
       <h3 class="category-title" style="color: ${getCategoryColor('senior')};">
-        Équipes
+        Equipes
       </h3>
       <div class="equipes-grid">
   `;
 
   equipes.forEach(equipe => {
     html += `
-      <article class="equipe-card" onclick="location.href='/equipe/${equipe.num_equipe}';" style="cursor: pointer;">
+      <article class="equipe-card" tabindex="0" role="link" aria-label="Voir les details de l'equipe ${escapeHtml(equipe.nom)}" onclick="location.href='/equipe/${equipe.num_equipe}';" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); location.href='/equipe/${equipe.num_equipe}'; }">
         <div class="equipe-header">
           <h4>${escapeHtml(equipe.nom)}</h4>
           <div class="equipe-badge" style="background-color: ${getCategoryColor(equipe.categorie)}; color: white;">
@@ -93,7 +116,7 @@ function renderListeEquipes(equipes) {
   return html;
 }
 
-function renderEquipePage(equipes, user) {
+function renderEquipePage(equipes, user, filters = { search: '' }) {
   const equipesHtml = renderListeEquipes(equipes);
 
   return `<!DOCTYPE html>
@@ -118,6 +141,8 @@ function renderEquipePage(equipes, user) {
       <p>Découvrez toutes nos équipes. Cliquez sur une équipe pour voir ses détails et ses joueurs.</p>
     </section>
 
+    ${renderSearchBar(filters, equipes.length)}
+
     ${equipesHtml}
   </main>
 </body>
@@ -137,12 +162,9 @@ function renderDetailEquipe(equipe, joueurs, user) {
 
   const joueursHtml = joueurs.map(joueur => `
     <tr>
-      <td>${escapeHtml(joueur.numero_maillot || '—')}</td>
       <td>
         <strong>${escapeHtml(joueur.prenom)} ${escapeHtml(joueur.nom)}</strong>
-        ${joueur.capitaine ? '<span class="captain-badge">C</span>' : ''}
       </td>
-      <td>${escapeHtml(joueur.position || '—')}</td>
       <td>${joueur.taille_cm || '—'} cm</td>
       <td>${joueur.poids_kg || '—'} kg</td>
       <td>
@@ -238,9 +260,7 @@ function renderDetailEquipe(equipe, joueurs, user) {
           <table class="team-table">
             <thead>
               <tr>
-                <th>#</th>
                 <th>Joueur</th>
-                <th>Poste</th>
                 <th>Taille</th>
                 <th>Poids</th>
                 <th>Statut</th>

@@ -1,26 +1,14 @@
 const { renderHotbar } = require('./hotbar.view');
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
+const {
+  escapeHtml,
+  formatDateTime,
+  getTypeLabel,
+  getStatusLabel,
+  selectedAttr
+} = require('./view.utils');
 
 function formatDate(value) {
-  if (!value) {
-    return 'Date inconnue';
-  }
-
-  return new Date(value).toLocaleString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  return formatDateTime(value, 'Date inconnue');
 }
 
 function formatMonthValue(date) {
@@ -51,28 +39,6 @@ function normalizeDateKey(value) {
   const day = String(d.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${day}`;
-}
-
-function getTypeLabel(type) {
-  const labels = {
-    match: 'Match',
-    tournoi: 'Tournoi',
-    entrainement: 'Entrainement',
-    autre: 'Autre'
-  };
-
-  return labels[type] || type;
-}
-
-function getStatusLabel(status) {
-  const labels = {
-    planifie: 'Planifie',
-    en_cours: 'En cours',
-    termine: 'Termine',
-    annule: 'Annule'
-  };
-
-  return labels[status] || status;
 }
 
 function buildQuery(filters, overrides = {}) {
@@ -401,10 +367,6 @@ function getCurrentMonthValue(filters, events) {
   const now = new Date();
   const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
   return `${now.getFullYear()}-${currentMonth}`;
-}
-
-function selectedAttr(condition) {
-  return condition ? 'selected' : '';
 }
 
 function renderTypeOptions(filters, isAdmin) {

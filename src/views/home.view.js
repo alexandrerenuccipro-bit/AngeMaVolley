@@ -1,13 +1,5 @@
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
 const { renderHotbar } = require('./hotbar.view');
+const { escapeHtml } = require('./view.utils');
 
 function renderHomePage({
   title,
