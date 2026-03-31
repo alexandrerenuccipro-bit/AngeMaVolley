@@ -182,19 +182,9 @@ function getRoleCards(user, { licenceRequests = [], teams = [], upcomingEvents =
     ],
     utilisateur: [
       {
-        title: 'Demander une licence',
-        text: 'Complète le formulaire pour devenir joueur licencié ou coach.',
-        link: '#licence-form'
-      },
-      {
         title: 'Clubs disponibles',
         text: 'Consulte les équipes et choisis un club avant de faire ta demande.',
         link: '/equipe'
-      },
-      {
-        title: 'Calendrier public',
-        text: 'Découvre les prochains événements du club.',
-        link: '/calendrier'
       }
     ],
     responsable_club: [

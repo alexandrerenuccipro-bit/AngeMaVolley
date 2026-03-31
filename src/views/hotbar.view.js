@@ -10,6 +10,7 @@ function getNavLinksByRole(user) {
       { href: '/admin/licences', label: 'Licences' },
       { href: '/admin/joueurs', label: 'Joueurs' },
       { href: '/admin/coachs', label: 'Coachs' },
+      { href: '/equipe', label: 'Les équipes' },
       { href: '/calendrier', label: 'Calendrier' },
       { href: '/evenements', label: 'Créer événement' }
     );
@@ -29,21 +30,13 @@ function getNavLinksByRole(user) {
     links.push(
       { href: '/joueur/equipe', label: 'Mon équipe' },
       { href: '/joueur/licences', label: 'Mes licences' },
-      { href: '/joueur/events', label: 'Mes événements' }
-    );
-  }
-  // ── UTILISATEUR (non-inscrit) ──────────────────────────────────
-  else if (user.role === 'utilisateur') {
-    links.push(
-      { href: '/dashboard', label: 'Demander licence' }
+      { href: '/joueur/events', label: 'Mes événements' },
+      { href: '/calendrier', label: 'Calendrier' }
     );
   }
 
   // ── COMMUN À TOUS (sauf admin) ──────────────────────────────
   if (!user.estAdmin) {
-    if (user.role !== 'coach' && user.role !== 'licencie') {
-      links.push({ href: '/calendrier', label: 'Calendrier' });
-    }
     links.push({ href: '/equipe', label: 'Les équipes' });
   }
 
