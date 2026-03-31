@@ -14,6 +14,43 @@ async function findActiveUserByEmail(email) {
   return rows[0] || null;
 }
 
+async function findUserTeamNamesForDashboard(user) {
+  if (!user || user.estAdmin) {
+    return [];
+  }
+
+  if (user.role === 'coach') {
+    const [rows] = await pool.query(
+      `
+      SELECT DISTINCT e.nom
+      FROM equipe e
+      WHERE e.num_coach = ?
+      ORDER BY e.nom ASC
+      `,
+      [user.id]
+    );
+
+    return rows.map((row) => row.nom);
+  }
+
+  if (user.role === 'licencie') {
+    const [rows] = await pool.query(
+      `
+      SELECT DISTINCT e.nom
+      FROM equipe_licencie el
+      JOIN equipe e ON e.num_equipe = el.num_equipe
+      WHERE el.num_user = ?
+      ORDER BY e.nom ASC
+      `,
+      [user.id]
+    );
+
+    return rows.map((row) => row.nom);
+  }
+
+  return [];
+}
+
 async function findUserByEmail(email) {
   const [rows] = await pool.query(
     `
@@ -275,8 +312,41 @@ async function createLicenceRequestWithProfile({ userId, typeDemande, licencieDa
   }
 }
 
+// ── RENOUVELLEMENT &  RÉSILIATION ───────────────────────────
+async function renewLicence(numUser, numLicence, userRole = 'licencie') {
+  const tableName = userRole === 'coach' ? 'licence_coach' : 'licence_joueur';
+
+  const [result] = await pool.query(
+    `
+      UPDATE ${tableName}
+      SET date_debut = CURDATE(),
+          date_fin = DATE_ADD(CURDATE(), INTERVAL 1 YEAR),
+          validee = 0,
+          date_validation = NULL
+      WHERE num_licence = ? AND num_user = ?
+    `,
+    [numLicence, numUser]
+  );
+  return result.affectedRows > 0;
+}
+
+async function resignLicence(numUser, numLicence, userRole = 'licencie') {
+  const tableName = userRole === 'coach' ? 'licence_coach' : 'licence_joueur';
+
+  const [result] = await pool.query(
+    `
+      UPDATE ${tableName}
+      SET date_fin = CURDATE()
+      WHERE num_licence = ? AND num_user = ?
+    `,
+    [numLicence, numUser]
+  );
+  return result.affectedRows > 0;
+}
+
 module.exports = {
   findActiveUserByEmail,
+  findUserTeamNamesForDashboard,
   findUserByEmail,
   createUser,
   findLicenceRequestByUserId,
@@ -285,5 +355,7 @@ module.exports = {
   createLicenceRequest,
   getClubsList,
   createLicenceRequestWithProfile,
-  syncUserRoleWithAcceptedLicence
+  syncUserRoleWithAcceptedLicence,
+  renewLicence,
+  resignLicence
 };

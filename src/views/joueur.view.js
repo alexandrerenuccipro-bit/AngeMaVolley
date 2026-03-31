@@ -1,36 +1,11 @@
 const { renderHotbar } = require('./hotbar.view');
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-function formatDate(value) {
-  if (!value) return '—';
-  return new Date(value).toLocaleDateString('fr-FR', {
-    day: '2-digit', month: '2-digit', year: 'numeric'
-  });
-}
-
-function formatDateTime(value) {
-  if (!value) return '—';
-  return new Date(value).toLocaleString('fr-FR', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
-}
-
-function getTypeLabel(type) {
-  return { match: 'Match', tournoi: 'Tournoi', entrainement: 'Entraînement', autre: 'Autre' }[type] || type;
-}
-
-function getStatusLabel(statut) {
-  return { planifie: 'Planifié', en_cours: 'En cours', termine: 'Terminé', annule: 'Annulé' }[statut] || statut;
-}
+const {
+  escapeHtml,
+  formatDate,
+  formatDateTime,
+  getTypeLabel,
+  getStatusLabel
+} = require('./view.utils');
 
 function getResultatLabel(resultat) {
   return { victoire: '✓ Victoire', defaite: '✗ Défaite', nul: '= Nul', forfait: '⚠ Forfait' }[resultat] || '—';
@@ -38,19 +13,6 @@ function getResultatLabel(resultat) {
 
 function getResultatClass(resultat) {
   return { victoire: 'status-actif', defaite: 'status-suspendu', nul: 'status-inactif', forfait: 'status-inactif' }[resultat] || '';
-}
-
-// ── NAV JOUEUR ──────────────────────────────────────────────────
-function renderJoueurNav(active) {
-  const links = [
-    { href: '/joueur/equipe',   label: 'Mon équipe' },
-    { href: '/joueur/licences', label: 'Mes licences' },
-    { href: '/joueur/events',   label: 'Mes événements' }
-  ];
-
-  return `<nav class="admin-nav" aria-label="Navigation joueur">
-    ${links.map(l => `<a href="${l.href}" ${active === l.label ? 'class="active"' : ''}>${l.label}</a>`).join('')}
-  </nav>`;
 }
 
 // ── LAYOUT PARTAGÉ ──────────────────────────────────────────────
@@ -70,7 +32,6 @@ function renderJoueurLayout({ title, user, content }) {
     ${renderHotbar(user)}
   </header>
   <main class="page">
-    ${renderJoueurNav(title)}
     ${content}
   </main>
 </body>
@@ -84,7 +45,6 @@ function renderJoueurEquipe({ user, profil, equipe, coequipiers }) {
       <article class="info-card">
         <h3>Mon profil</h3>
         <ul style="list-style:none; padding:0;">
-          <li><strong>Poste :</strong> ${escapeHtml(profil.position || '—')}</li>
           <li><strong>Taille :</strong> ${profil.taille_cm ? profil.taille_cm + ' cm' : '—'}</li>
           <li><strong>Poids :</strong> ${profil.poids_kg ? profil.poids_kg + ' kg' : '—'}</li>
           <li><strong>Club :</strong> ${escapeHtml(profil.nom_club || '—')}</li>
@@ -99,8 +59,6 @@ function renderJoueurEquipe({ user, profil, equipe, coequipiers }) {
         <h3>Mon équipe</h3>
         <ul style="list-style:none; padding:0;">
           <li><strong>Équipe :</strong> ${escapeHtml(equipe.nom)}</li>
-          <li><strong>Numéro :</strong> #${escapeHtml(String(equipe.numero_maillot || '—'))}</li>
-          ${equipe.capitaine ? '<li><span class="captain-badge">Capitaine</span></li>' : ''}
           <li><strong>Intégré le :</strong> ${formatDate(equipe.date_integration)}</li>
           <li><strong>Joueurs :</strong> ${equipe.nb_joueurs}/${equipe.nb_joueurs_max}</li>
         </ul>
@@ -140,17 +98,14 @@ function renderJoueurEquipe({ user, profil, equipe, coequipiers }) {
       <div class="table-wrapper">
         <table class="team-table">
           <thead><tr>
-            <th>#</th><th>Joueur</th><th>Poste</th><th>Statut</th>
+            <th>Joueur</th><th>Statut</th>
           </tr></thead>
           <tbody>
             ${coequipiers.map(j => `
               <tr>
-                <td><strong>${escapeHtml(String(j.numero_maillot || '—'))}</strong></td>
                 <td>
                   ${escapeHtml(j.prenom)} ${escapeHtml(j.nom)}
-                  ${j.capitaine ? '<span class="captain-badge">C</span>' : ''}
                 </td>
-                <td>${escapeHtml(j.position || '—')}</td>
                 <td><span class="status-badge status-${escapeHtml(j.statut)}">${escapeHtml(j.statut)}</span></td>
               </tr>
             `).join('')}
@@ -183,7 +138,7 @@ function renderJoueurLicences({ user, licences }) {
 
   const statutGlobal = licenceActive
     ? `<div class="alert-success">✓ Tu as une licence valide jusqu'au ${formatDate(licenceActive.date_fin)}.</div>`
-    : `<div style="background:#fef2f2; border:1px solid #fca5a5; color:#7f1d1d; padding:0.8rem 1.2rem; border-radius:8px; margin-bottom:1.5rem; font-weight:600;">
+    : `<div class="alert-warning">
         ⚠ Aucune licence active. Rapproche-toi de ton responsable de club.
       </div>`;
 

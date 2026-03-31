@@ -11,7 +11,6 @@ async function getJoueurProfil(numUser) {
       u.telephone,
       u.date_naissance,
       li.statut,
-      li.position,
       li.poids_kg,
       li.taille_cm,
       c.nom  AS nom_club,
@@ -35,8 +34,6 @@ async function getJoueurEquipe(numUser) {
       eq.couleur_maillot,
       eq.date_creation,
       eq.nb_joueurs_max,
-      el.numero_maillot,
-      el.capitaine,
       el.date_integration,
       c.nom  AS nom_club,
       c.ville,
@@ -50,7 +47,7 @@ async function getJoueurEquipe(numUser) {
     LEFT JOIN utilisateur u ON eq.num_coach = u.num_user
     LEFT JOIN equipe_licencie el2 ON el2.num_equipe = eq.num_equipe
     WHERE el.num_user = ?
-    GROUP BY eq.num_equipe, el.numero_maillot, el.capitaine, el.date_integration
+    GROUP BY eq.num_equipe, el.date_integration
   `, [numUser]);
   return rows[0] || null;
 }
@@ -60,15 +57,12 @@ async function getCoequipiers(numEquipe, numUser) {
     SELECT
       u.prenom,
       u.nom,
-      el.numero_maillot,
-      el.capitaine,
-      li.position,
       li.statut
     FROM equipe_licencie el
     JOIN utilisateur u ON el.num_user = u.num_user
     JOIN licencie li ON li.num_user = u.num_user
     WHERE el.num_equipe = ? AND el.num_user != ?
-    ORDER BY el.numero_maillot ASC
+    ORDER BY u.nom ASC, u.prenom ASC
   `, [numEquipe, numUser]);
   return rows;
 }
@@ -78,15 +72,15 @@ async function getJoueurLicences(numUser) {
   const [rows] = await pool.query(`
     SELECT
       l.num_licence,
-      l.type,
+      'licencie' AS type,
       l.date_debut,
       l.date_fin,
       l.validee,
       l.date_validation,
-      l.montant_cotisation,
+      NULL AS montant_cotisation,
       v.prenom AS validateur_prenom,
       v.nom    AS validateur_nom
-    FROM licence l
+    FROM licence_joueur l
     LEFT JOIN utilisateur v ON l.num_validateur = v.num_user
     WHERE l.num_user = ?
     ORDER BY l.date_debut DESC

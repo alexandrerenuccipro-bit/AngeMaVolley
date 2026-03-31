@@ -5,7 +5,7 @@ const {
   invaliderLicence,
   getAllJoueurs,
   getAllCoachs,
-  getAllEvents
+  getAllEvenements
 } = require('../models/admin.model');
 
 const {
@@ -13,7 +13,7 @@ const {
   renderAdminLicences,
   renderAdminJoueurs,
   renderAdminCoachs,
-  renderAdminEvents
+  renderAdminEvenements
 } = require('../views/admin.view');
 
 // ── DASHBOARD ───────────────────────────────────────────────────
@@ -42,11 +42,14 @@ exports.licences = async (req, res) => {
 };
 
 exports.validerLicence = async (req, res) => {
-  const numLicence = parseInt(req.params.numLicence, 10);
-  if (!numLicence) return res.redirect('/admin/licences');
+  const typeDemande = String(req.params.typeDemande || '').trim();
+  const numDemande = parseInt(req.params.numDemande, 10);
+  if (!['coach', 'licencie'].includes(typeDemande) || !numDemande) {
+    return res.redirect('/admin/licences');
+  }
 
   try {
-    await validerLicence(numLicence, req.session.user.id);
+    await validerLicence(typeDemande, numDemande, req.session.user.id);
     return res.redirect('/admin/licences?success=valide');
   } catch (error) {
     console.error('Erreur validation licence:', error.message);
@@ -55,11 +58,14 @@ exports.validerLicence = async (req, res) => {
 };
 
 exports.invaliderLicence = async (req, res) => {
-  const numLicence = parseInt(req.params.numLicence, 10);
-  if (!numLicence) return res.redirect('/admin/licences');
+  const typeDemande = String(req.params.typeDemande || '').trim();
+  const numDemande = parseInt(req.params.numDemande, 10);
+  if (!['coach', 'licencie'].includes(typeDemande) || !numDemande) {
+    return res.redirect('/admin/licences');
+  }
 
   try {
-    await invaliderLicence(numLicence);
+    await invaliderLicence(typeDemande, numDemande);
     return res.redirect('/admin/licences?success=invalide');
   } catch (error) {
     console.error('Erreur invalidation licence:', error.message);
@@ -92,13 +98,13 @@ exports.coachs = async (req, res) => {
 };
 
 // ── ÉVÉNEMENTS ──────────────────────────────────────────────────
-exports.events = async (req, res) => {
+exports.evenements = async (req, res) => {
   try {
-    const events = await getAllEvents();
-    const html = renderAdminEvents({ user: req.session.user, events });
+    const evenements = await getAllEvenements();
+    const html = renderAdminEvenements({ user: req.session.user, evenements });
     return res.status(200).send(html);
   } catch (error) {
-    console.error('Erreur admin events:', error.message);
+    console.error('Erreur admin evenements:', error.message);
     return res.status(500).send('<h1>Erreur serveur</h1>');
   }
 };

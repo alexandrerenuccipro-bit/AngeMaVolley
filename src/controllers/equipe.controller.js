@@ -3,8 +3,9 @@ const { renderEquipePage, renderDetailEquipe } = require('../views/equipe.view')
 
 exports.listEquipes = async (req, res) => {
   try {
-    const equipes = await getAllEquipes();
-    const html = renderEquipePage(equipes, req.session.user || null);
+    const search = String(req.query.search || '').trim().slice(0, 80);
+    const equipes = await getAllEquipes(search);
+    const html = renderEquipePage(equipes, req.session.user || null, { search });
     res.status(200).send(html);
   } catch (error) {
     console.error('Erreur chargement équipes:', error.message);

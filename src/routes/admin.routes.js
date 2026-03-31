@@ -10,10 +10,10 @@ router.use(requireAuth, requireAdmin);
 
 router.get('/',               adminController.dashboard);
 router.get('/licences',       adminController.licences);
-router.post('/licences/:numLicence/valider',    adminController.validerLicence);
-router.post('/licences/:numLicence/invalider',  adminController.invaliderLicence);
+router.post('/licences/:typeDemande/:numDemande/valider',    adminController.validerLicence);
+router.post('/licences/:typeDemande/:numDemande/invalider',  adminController.invaliderLicence);
 router.get('/joueurs',        adminController.joueurs);
 router.get('/coachs',         adminController.coachs);
-router.get('/events',         adminController.events);
+router.get('/evenements',     adminController.evenements);
 
 module.exports = router;

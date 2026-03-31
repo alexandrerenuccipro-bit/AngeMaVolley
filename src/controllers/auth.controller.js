@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 const {
   findActiveUserByEmail,
+  findUserTeamNamesForDashboard,
   findUserByEmail,
   createUser,
   findLicenceRequestByUserId,
@@ -8,8 +9,14 @@ const {
   findAllLicenceRequests,
   getClubsList,
   createLicenceRequestWithProfile,
-  syncUserRoleWithAcceptedLicence
+  syncUserRoleWithAcceptedLicence,
+  renewLicence,
+  resignLicence
 } = require('../models/auth.model');
+const {
+  getUpcomingEventsForAdmin,
+  getUpcomingEventsForUser
+} = require('../models/home.model');
 const { renderLoginPage, renderRegisterPage } = require('../views/auth.view');
 const { renderDashboardPage } = require('../views/dashboard.view');
 
@@ -145,20 +152,35 @@ exports.login = async (req, res) => {
 exports.dashboard = async (req, res) => {
   try {
     const isAdmin = Boolean(req.session.user.estAdmin);
+    const teamsPromise = findUserTeamNamesForDashboard(req.session.user);
 
     const syncedRole = await syncUserRoleWithAcceptedLicence(req.session.user.id);
     if (syncedRole && !isAdmin) {
       req.session.user.role = syncedRole;
     }
 
-    const [licenceRequests, clubs] = await Promise.all([
+    const shouldLoadUpcomingEvents = isAdmin || ['coach', 'licencie'].includes(req.session.user.role);
+
+    const [teams, licenceRequests, clubs, upcomingEvents] = await Promise.all([
+      teamsPromise,
       isAdmin
         ? findAllLicenceRequests(50)
         : findLicenceRequestsByUserId(req.session.user.id, 20),
-      isAdmin ? Promise.resolve([]) : getClubsList()
+      isAdmin ? Promise.resolve([]) : getClubsList(),
+      shouldLoadUpcomingEvents
+        ? (isAdmin
+          ? getUpcomingEventsForAdmin(8)
+          : getUpcomingEventsForUser(req.session.user.id, 8))
+        : Promise.resolve([])
     ]);
 
-    const html = renderDashboardPage({ user: req.session.user, licenceRequests, clubs });
+    const html = renderDashboardPage({
+      user: req.session.user,
+      teams,
+      licenceRequests,
+      clubs,
+      upcomingEvents
+    });
     return res.status(200).send(html);
   } catch (error) {
     console.error('Erreur dashboard:', error.message);
@@ -238,4 +260,34 @@ exports.logout = (req, res) => {
   req.session.destroy(() => {
     res.redirect('/connexion');
   });
+};
+
+exports.renewLicence = async (req, res) => {
+  try {
+    const numLicence = parseInt(req.params.numLicence, 10);
+    if (!numLicence) {
+      return res.redirect('/dashboard');
+    }
+
+    await renewLicence(req.session.user.id, numLicence, req.session.user.role);
+    return res.redirect('/dashboard?renewed=true');
+  } catch (error) {
+    console.error('Erreur renouvellement licence:', error.message);
+    return res.redirect('/dashboard');
+  }
+};
+
+exports.resignLicence = async (req, res) => {
+  try {
+    const numLicence = parseInt(req.params.numLicence, 10);
+    if (!numLicence) {
+      return res.redirect('/dashboard');
+    }
+
+    await resignLicence(req.session.user.id, numLicence, req.session.user.role);
+    return res.redirect('/dashboard?resigned=true');
+  } catch (error) {
+    console.error('Erreur résiliation licence:', error.message);
+    return res.redirect('/dashboard');
+  }
 };

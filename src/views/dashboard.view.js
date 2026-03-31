@@ -1,30 +1,88 @@
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+const { renderHotbar } = require('./hotbar.view');
+const { escapeHtml, formatDateTime, getTypeLabel } = require('./view.utils');
+
+function getLicenceTypeLabel(typeDemande) {
+  return typeDemande === 'coach' ? 'Coach' : 'Licencie';
 }
 
-const { renderHotbar } = require('./hotbar.view');
+function renderMiniStat(label, value) {
+  return `
+    <div style="display:inline-flex; align-items:center; gap:0.35rem; font-size:0.82rem; padding:0.25rem 0.55rem; border:1px solid var(--border); border-radius:999px; color:var(--muted-text); margin-right:0.4rem; margin-top:0.45rem;">
+      <strong style="color:var(--text-color, #fff);">${escapeHtml(String(value))}</strong>
+      <span>${escapeHtml(label)}</span>
+    </div>
+  `;
+}
 
-function renderAdminLicenceRequests(requests) {
-  if (!requests.length) {
+function countRequestsByStatus(licenceRequests = []) {
+  return licenceRequests.reduce(
+    (acc, req) => {
+      if (req.statut === 'en_attente') acc.pending += 1;
+      if (req.statut === 'validee') acc.validated += 1;
+      if (req.statut === 'refusee') acc.refused += 1;
+      return acc;
+    },
+    { pending: 0, validated: 0, refused: 0 }
+  );
+}
+
+function renderAdminLicenceRequests(requests, limit = 4) {
+  const pendingRequests = requests.filter((request) => request.statut === 'en_attente');
+
+  if (!pendingRequests.length) {
     return '<p>Aucune demande de licence pour le moment.</p>';
   }
 
-  return requests
+  const visibleRequests = pendingRequests.slice(0, limit);
+  const hiddenCount = Math.max(0, pendingRequests.length - visibleRequests.length);
+
+  return `
+    <p><strong>${pendingRequests.length}</strong> demande(s) en attente</p>
+    <ul style="list-style:none; margin:0.75rem 0 0; padding:0; display:grid; gap:0.6rem;">
+    ${visibleRequests
     .map(
       (request) => `
-        <p>
-          <strong>${escapeHtml(request.prenom)} ${escapeHtml(request.nom)}</strong>
-          - ${escapeHtml(request.type_demande)}
-          - ${escapeHtml(request.statut)}
-        </p>
+        <li style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; padding:0.55rem 0.7rem; border:1px solid var(--border, #ddd); border-radius:10px;">
+          <div>
+            <strong>${escapeHtml(request.prenom)} ${escapeHtml(request.nom)}</strong>
+            <div style="font-size:0.9rem; opacity:0.85; margin-top:0.15rem;">${escapeHtml(getLicenceTypeLabel(request.type_demande))}</div>
+          </div>
+          <span style="background:var(--danger); color:#fff; font-size:0.78rem; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; padding:0.22rem 0.55rem; border-radius:999px;">En attente</span>
+        </li>
       `
     )
-    .join('');
+    .join('')}
+    </ul>
+    ${hiddenCount > 0 ? `<p style="margin-top:0.7rem; font-size:0.9rem; color:var(--muted-text);">+ ${hiddenCount} autre(s) demande(s)</p>` : ''}
+  `;
+}
+
+function renderUpcomingEvents(events = [], limit = 4, options = {}) {
+  const { compact = false } = options;
+
+  if (!events.length) {
+    return '<p>Aucun événement à venir.</p>';
+  }
+
+  const visibleEvents = events.slice(0, limit);
+  const hiddenCount = Math.max(0, events.length - visibleEvents.length);
+
+  return `
+    <ul style="list-style:none; margin:0.75rem 0 0; padding:0; display:grid; gap:${compact ? '0.45rem' : '0.6rem'};">
+      ${visibleEvents
+        .map(
+          (event) => `
+            <li style="padding:${compact ? '0.45rem 0.6rem' : '0.55rem 0.7rem'}; border:1px solid var(--border, #ddd); border-radius:10px;">
+              <strong>${escapeHtml(getTypeLabel(event.type))}</strong>
+              <div style="font-size:${compact ? '0.85rem' : '0.9rem'}; opacity:0.9; margin-top:0.2rem;">${escapeHtml(event.description || 'Événement')}</div>
+              <div style="font-size:${compact ? '0.78rem' : '0.82rem'}; color:var(--muted-text); margin-top:0.2rem;">${escapeHtml(formatDateTime(event.date_debut))}</div>
+            </li>
+          `
+        )
+        .join('')}
+    </ul>
+    ${hiddenCount > 0 ? `<p style="margin-top:0.7rem; font-size:0.9rem; color:var(--muted-text);">+ ${hiddenCount} autre(s) événement(s)</p>` : ''}
+  `;
 }
 
 function getRoleLabel(user) {
@@ -35,32 +93,109 @@ function getRoleLabel(user) {
   const labels = {
     admin: 'Admin',
     coach: 'Coach',
-    licencie: 'Joueur / Licencie',
+    licencie: 'Joueur/Licencié',
     responsable_club: 'Responsable de club'
   };
 
   return labels[user.role] || user.role;
 }
 
-function getRoleCards(user, licenceRequests = []) {
+function getRoleCards(user, { licenceRequests = [], teams = [], upcomingEvents = [] } = {}) {
   if (user.estAdmin) {
     return [
-      { title: 'Supervision plateforme', text: 'Surveille les comptes et permissions.' },
-      {
+      { 
         title: 'Validation licences',
-        html: renderAdminLicenceRequests(licenceRequests)
+        html: renderAdminLicenceRequests(licenceRequests, 4)
+      },
+      {
+        title: 'Prochains événements',
+        html: renderUpcomingEvents(upcomingEvents, 4),
+        link: '/calendrier'
       }
     ];
   }
 
+  const teamSummary = teams.length
+    ? `Équipe(s): ${teams.slice(0, 2).map((team) => escapeHtml(team)).join(', ')}${teams.length > 2 ? ` (+${teams.length - 2})` : ''}`
+ : 'Aucune équipe attribuée pour le moment.';
+  const requestStats = countRequestsByStatus(licenceRequests);
+
   const cardsByRole = {
     coach: [
-      { title: 'Seance du jour', text: 'Planifie les exercices et la charge de travail.' },
-      { title: 'Suivi effectif', text: 'Consulte la disponibilite des joueurs.' }
+      {
+        title: 'Mon équipe',
+        html: `
+          <p style="margin:0.2rem 0 0.5rem;">${teamSummary}</p>
+          ${renderMiniStat('équipe(s)', teams.length || 0)}
+          ${renderMiniStat('événement(s)', upcomingEvents.length || 0)}
+        `,
+        link: '/coach/equipe'
+      },
+      {
+        title: 'Mes joueurs',
+        html: `
+          <p style="margin:0.2rem 0;">Accéder à la liste complète de ton groupe.</p>
+          <p style="margin:0.25rem 0 0; color:var(--muted-text); font-size:0.88rem;">Suivi des statut.</p>
+        `,
+        link: '/coach/joueurs'
+      },
+      {
+        title: 'Mes licences',
+        html: `
+          <p style="margin:0.2rem 0;">Historique de validation de tes licences coach.</p>
+          ${renderMiniStat('en attente', requestStats.pending)}
+          ${renderMiniStat('validées', requestStats.validated)}
+        `,
+        link: '/coach/licences'
+      },
+      {
+        title: 'Planning rapide',
+        html: renderUpcomingEvents(upcomingEvents, 2, { compact: true }),
+        link: '/coach/events'
+      }
     ],
     licencie: [
-      { title: 'Mes entrainements', text: 'Retrouve ton planning personnel.' },
-      { title: 'Mes performances', text: 'Consulte tes statistiques recentes.' }
+      {
+        title: 'Mon équipe',
+        html: `
+          <p style="margin:0.2rem 0 0.45rem;">${teamSummary}</p>
+          ${renderMiniStat('équipe(s)', teams.length || 0)}
+          ${renderMiniStat('événement(s)', upcomingEvents.length || 0)}
+        `,
+        link: '/joueur/equipe'
+      },
+      {
+        title: 'Mes licences',
+        html: `
+          <p style="margin:0.2rem 0 0.45rem;">Retrouver les périodes de validité et les validations.</p>
+          ${renderMiniStat('demande(s)', licenceRequests.length || 0)}
+          ${renderMiniStat('en attente', requestStats.pending)}
+          ${renderMiniStat('validées', requestStats.validated)}
+        `,
+        link: '/joueur/licences'
+      },
+      {
+        title: 'Mes événements',
+        html: renderUpcomingEvents(upcomingEvents, 2, { compact: true }),
+        link: '/joueur/events'
+      }
+    ],
+    utilisateur: [
+      {
+        title: 'Demander une licence',
+        text: 'Complète le formulaire pour devenir joueur licencié ou coach.',
+        link: '#licence-form'
+      },
+      {
+        title: 'Clubs disponibles',
+        text: 'Consulte les équipes et choisis un club avant de faire ta demande.',
+        link: '/equipe'
+      },
+      {
+        title: 'Calendrier public',
+        text: 'Découvre les prochains événements du club.',
+        link: '/calendrier'
+      }
     ],
     responsable_club: [
       { title: 'Gestion club', text: 'Mets a jour les informations du club.' },
@@ -71,29 +206,49 @@ function getRoleCards(user, licenceRequests = []) {
   return cardsByRole[user.role] || [{ title: 'Tableau de bord', text: 'Bienvenue sur ton espace.' }];
 }
 
-function renderDashboardPage({ user, licenceRequests = [], clubs = [] }) {
+function renderTeamLine(user, teams) {
+  const shouldShowTeams = user.role === 'coach' || user.role === 'licencie';
+
+  if (!shouldShowTeams) {
+    return '';
+  }
+
+  if (!teams.length) {
+    return '<p>Équipe: <strong>Non attribuée</strong></p>';
+  }
+
+  const label = teams.length > 1 ? 'Équipes' : 'Équipe';
+  const teamNames = teams.map((teamName) => escapeHtml(teamName)).join(', ');
+
+  return `<p>${label}: <strong>${teamNames}</strong></p>`;
+}
+
+function renderDashboardPage({ user, teams = [], licenceRequests = [], clubs = [], upcomingEvents = [] }) {
   const canRequestLicence = !user.estAdmin && user.role === 'utilisateur';
   const hasPendingRequest = licenceRequests.some((request) => request.statut === 'en_attente');
+  const visibleHistory = licenceRequests.slice(0, 5);
+  const hiddenHistoryCount = Math.max(0, licenceRequests.length - visibleHistory.length);
 
   const licenceRequestHistoryMarkup = !user.estAdmin && licenceRequests.length
     ? `<article class="info-card">
         <h3>Mes demandes de licence</h3>
-        ${licenceRequests
+        ${visibleHistory
           .map(
             (request) => `
-          <p>
-            <strong>${escapeHtml(request.type_demande)}</strong>
+          <p style="margin:0.35rem 0;">
+            <strong>${escapeHtml(getLicenceTypeLabel(request.type_demande))}</strong>
             - ${escapeHtml(request.statut)}
           </p>
         `
           )
           .join('')}
+        ${hiddenHistoryCount > 0 ? `<p style="margin-top:0.7rem; font-size:0.9rem; color:var(--muted-text);">+ ${hiddenHistoryCount} autre(s) demande(s)</p>` : ''}
       </article>`
     : '';
 
   const licenceRequestFormMarkup = !canRequestLicence || hasPendingRequest
     ? ''
-    : `<article class="info-card">
+    : `<article id="licence-form" class="info-card">
         <h3>Demander une licence</h3>
         <p>Choisis le type de licence puis complete le formulaire correspondant.</p>
         <form method="POST" action="/dashboard/demande-licence" class="auth-form">
@@ -132,12 +287,16 @@ function renderDashboardPage({ user, licenceRequests = [], clubs = [] }) {
         </form>
       </article>`;
 
-  const cardsMarkup = getRoleCards(user, licenceRequests)
+  const cardsMarkup = getRoleCards(user, { licenceRequests, teams, upcomingEvents })
     .map(
       (card) => `
-      <article class="info-card">
+      <article class="info-card" ${card.link ? `style="cursor:pointer; transition:all 0.3s ease; border:1px solid var(--border); position:relative; overflow:hidden;"` : ''} ${card.link ? `onclick="window.location.href='${card.link}'" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"` : ''}>
         <h3>${escapeHtml(card.title)}</h3>
-        ${card.html || `<p>${escapeHtml(card.text)}</p>`}
+        ${card.html || `<p>${escapeHtml(card.text || '')}</p>`}
+        ${card.link ? `<div style="font-size:0.85rem; color:var(--muted-text); margin-top:0.8rem; display:flex; align-items:center; justify-content:center; gap:0.4rem;">
+          <span>Accéder</span>
+          <span style="font-size:1rem;">→</span>
+        </div>` : ''}
       </article>
     `
     )
@@ -196,13 +355,14 @@ function renderDashboardPage({ user, licenceRequests = [], clubs = [] }) {
     <section class="hero-card">
       <p class="tag">Espace personnel</p>
       <h2>Bienvenue ${escapeHtml(user.prenom)} ${escapeHtml(user.nom)}</h2>
-      <p>Role: <strong>${escapeHtml(getRoleLabel(user))}</strong></p>
+      <p>Rôle: <strong>${escapeHtml(getRoleLabel(user))}</strong></p>
+      ${renderTeamLine(user, teams)}
       <form method="POST" action="/deconnexion">
         <button type="submit" class="cta cta-outline">Se deconnecter</button>
       </form>
     </section>
 
-    <section class="grid-cards" aria-label="Actions par role">
+    <section class="grid-cards" aria-label="Actions par role" style="align-items:start;">
       ${cardsMarkup}
       ${licenceRequestHistoryMarkup}
       ${licenceRequestFormMarkup}
