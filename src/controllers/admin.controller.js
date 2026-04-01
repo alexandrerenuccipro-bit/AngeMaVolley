@@ -43,7 +43,7 @@ exports.licences = async (req, res) => {
 
 exports.validerLicence = async (req, res) => {
   const typeDemande = String(req.params.typeDemande || '').trim();
-  const numDemande = parseInt(req.params.numDemande, 10);
+  const numDemande = Number.parseInt(req.params.numDemande, 10);
   if (!['coach', 'licencie'].includes(typeDemande) || !numDemande) {
     return res.redirect('/admin/licences');
   }
@@ -59,7 +59,7 @@ exports.validerLicence = async (req, res) => {
 
 exports.invaliderLicence = async (req, res) => {
   const typeDemande = String(req.params.typeDemande || '').trim();
-  const numDemande = parseInt(req.params.numDemande, 10);
+  const numDemande = Number.parseInt(req.params.numDemande, 10);
   if (!['coach', 'licencie'].includes(typeDemande) || !numDemande) {
     return res.redirect('/admin/licences');
   }

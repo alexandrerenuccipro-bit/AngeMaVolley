@@ -54,10 +54,87 @@ async function getAllLicences() {
   return rows;
 }
 
-async function validerLicence(typeDemande, numDemande) {
+async function assignLicencieToClubTeam(numUser) {
+  const [existingAssignment] = await pool.query(
+    `
+      SELECT 1
+      FROM equipe_licencie
+      WHERE num_user = ?
+      LIMIT 1
+    `,
+    [numUser]
+  );
+
+  if (existingAssignment.length) {
+    return false;
+  }
+
+  const [licencieRows] = await pool.query(
+    `
+      SELECT num_club
+      FROM licencie
+      WHERE num_user = ?
+      LIMIT 1
+    `,
+    [numUser]
+  );
+
+  const numClub = licencieRows[0]?.num_club;
+  if (!numClub) {
+    return false;
+  }
+
+  const [teamRows] = await pool.query(
+    `
+      SELECT
+        eq.num_equipe,
+        COUNT(el.num_user) AS nb_joueurs
+      FROM equipe eq
+      LEFT JOIN equipe_licencie el ON el.num_equipe = eq.num_equipe
+      WHERE eq.num_club = ?
+      GROUP BY eq.num_equipe, eq.nb_joueurs_max
+      HAVING COUNT(el.num_user) < COALESCE(eq.nb_joueurs_max, 999999)
+      ORDER BY nb_joueurs ASC, eq.date_creation ASC, eq.num_equipe ASC
+      LIMIT 1
+    `,
+    [numClub]
+  );
+
+  const numEquipe = teamRows[0]?.num_equipe;
+  if (!numEquipe) {
+    return false;
+  }
+
+  await pool.query(
+    `
+      INSERT INTO equipe_licencie (num_equipe, num_user, date_integration)
+      VALUES (?, ?, CURDATE())
+    `,
+    [numEquipe, numUser]
+  );
+
+  return true;
+}
+
+async function validerLicence(typeDemande, numDemande, numValidateur = null) {
   const tableName = typeDemande === 'coach'
     ? 'demande_licence_coach'
     : 'demande_licence_joueur';
+
+  const [requestRows] = await pool.query(
+    `
+      SELECT num_user, statut
+      FROM ${tableName}
+      WHERE num_demande = ?
+      LIMIT 1
+    `,
+    [numDemande]
+  );
+
+  const request = requestRows[0] || null;
+  if (request?.statut !== 'en_attente') {
+    return false;
+  }
 
   const [result] = await pool.query(
     `
@@ -69,7 +146,54 @@ async function validerLicence(typeDemande, numDemande) {
     [numDemande]
   );
 
-  return result.affectedRows > 0;
+  if (!result.affectedRows) {
+    return false;
+  }
+
+  if (typeDemande === 'coach') {
+    await pool.query(
+      `
+        INSERT INTO licence_coach (
+          num_user,
+          date_debut,
+          date_fin,
+          validee,
+          num_validateur,
+          date_validation
+        )
+        VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 1, ?, NOW())
+      `,
+      [request.num_user, numValidateur]
+    );
+  } else {
+    await pool.query(
+      `
+        INSERT INTO licence_joueur (
+          num_user,
+          date_debut,
+          date_fin,
+          validee,
+          num_validateur,
+          date_validation
+        )
+        VALUES (?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), 1, ?, NOW())
+      `,
+      [request.num_user, numValidateur]
+    );
+
+    await pool.query(
+      `
+        UPDATE licencie
+        SET statut = 'actif'
+        WHERE num_user = ?
+      `,
+      [request.num_user]
+    );
+
+    await assignLicencieToClubTeam(request.num_user);
+  }
+
+  return true;
 }
 
 async function invaliderLicence(typeDemande, numDemande) {
