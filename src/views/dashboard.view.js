@@ -2,7 +2,23 @@ const { renderHotbar } = require('./hotbar.view');
 const { escapeHtml, formatDateTime, getTypeLabel } = require('./view.utils');
 
 function getLicenceTypeLabel(typeDemande) {
-  return typeDemande === 'coach' ? 'Coach' : 'Licencie';
+  return typeDemande === 'coach' ? 'Coach' : 'Licencié';
+}
+
+function getLicenceRequestStatusLabel(status) {
+  return {
+    en_attente: 'En attente',
+    validee: 'Validée',
+    refusee: 'Refusée'
+  }[status] || status;
+}
+
+function getLicenceRequestStatusClass(status) {
+  return {
+    en_attente: 'status-suspendu',
+    validee: 'status-actif',
+    refusee: 'status-inactif'
+  }[status] || 'status-inactif';
 }
 
 function renderMiniStat(label, value) {
@@ -218,21 +234,29 @@ function renderDashboardPage({ user, teams = [], licenceRequests = [], clubs = [
   const hasPendingRequest = licenceRequests.some((request) => request.statut === 'en_attente');
   const visibleHistory = licenceRequests.slice(0, 5);
   const hiddenHistoryCount = Math.max(0, licenceRequests.length - visibleHistory.length);
+  const licenceRequestMoreMarkup = hiddenHistoryCount > 0
+    ? `<p class="licence-request-more">+ ${hiddenHistoryCount} autre(s) demande(s)</p>`
+    : '';
 
   const licenceRequestHistoryMarkup = !user.estAdmin && licenceRequests.length
     ? `<article class="info-card">
         <h3>Mes demandes de licence</h3>
-        ${visibleHistory
-          .map(
-            (request) => `
-          <p style="margin:0.35rem 0;">
-            <strong>${escapeHtml(getLicenceTypeLabel(request.type_demande))}</strong>
-            - ${escapeHtml(request.statut)}
-          </p>
-        `
-          )
-          .join('')}
-        ${hiddenHistoryCount > 0 ? `<p style="margin-top:0.7rem; font-size:0.9rem; color:var(--muted-text);">+ ${hiddenHistoryCount} autre(s) demande(s)</p>` : ''}
+        <ul class="licence-request-list">
+          ${visibleHistory
+            .map(
+              (request) => `
+            <li class="licence-request-item">
+              <div class="licence-request-main">
+                <strong class="licence-request-type">${escapeHtml(getLicenceTypeLabel(request.type_demande))}</strong>
+                <span class="licence-request-date">${escapeHtml(formatDateTime(request.date_demande, 'Date inconnue'))}</span>
+              </div>
+              <span class="status-badge ${getLicenceRequestStatusClass(request.statut)}">${escapeHtml(getLicenceRequestStatusLabel(request.statut))}</span>
+            </li>
+          `
+            )
+            .join('')}
+        </ul>
+        ${licenceRequestMoreMarkup}
       </article>`
     : '';
 

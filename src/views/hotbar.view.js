@@ -22,6 +22,7 @@ function getNavLinksByRole(user) {
       { href: '/coach/joueurs', label: 'Mes joueurs' },
       { href: '/coach/licences', label: 'Mes licences' },
       { href: '/coach/events', label: 'Mes événements' },
+      { href: '/calendrier', label: 'Calendrier' },
       { href: '/evenements', label: 'Créer événement' }
     );
   }

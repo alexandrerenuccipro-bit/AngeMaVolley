@@ -372,8 +372,8 @@ textarea {
   display: inline-block;
   margin: 0 0 1rem;
   padding: 0.4rem 1rem;
-  background: var(--primary);
-  color: var(--light-bg);
+  background: var(--light-bg);
+  color: var(--primary);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.5px;
@@ -526,6 +526,48 @@ textarea {
 
 .info-card li {
   margin-bottom: 0.5rem;
+}
+
+.licence-request-list {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.licence-request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--card-bg) 88%, var(--light-bg) 12%);
+}
+
+.licence-request-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.licence-request-type {
+  color: var(--dark-text);
+  font-size: 1rem;
+}
+
+.licence-request-date {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+}
+
+.licence-request-more {
+  margin-top: 0.45rem;
+  color: var(--muted-text);
+  font-size: 0.9rem;
 }
 
 .highlight {
