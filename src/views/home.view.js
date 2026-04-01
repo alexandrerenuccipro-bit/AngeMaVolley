@@ -26,9 +26,7 @@ function renderHomePage({
       <p class="tag">Gestion d’équipe de volley</p>
       <h2>Bienvenue sur <span>${escapeHtml(title)}</span></h2>
       <p>${escapeHtml(message)}</p>
-      <div class="hero-actions">
-        ${user ? `<a href="/dashboard" class="cta">Accéder au Dashboard</a>` : `<a href="/connexion" class="cta">Connexion</a>`}
-      </div>
+      ${user ? `<div class="hero-actions"><a href="/dashboard" class="cta">Accéder au Dashboard</a></div>` : ''}
     </section>
     <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
       <article class="info-card">
